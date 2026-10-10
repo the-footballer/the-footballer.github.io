@@ -18,9 +18,9 @@ h1,h2,h3{font-family:Outfit,system-ui,sans-serif;font-weight:800;letter-spacing:
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(7,11,23,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
 .bar{max-width:1040px;margin:auto;display:flex;align-items:center;gap:10px 16px;padding:10px 16px;flex-wrap:wrap}
 .logo{font:800 22px Outfit,sans-serif;letter-spacing:3px}.logo b{color:var(--turf);margin-left:6px;background:none;padding:0}
-nav{margin-left:auto;display:flex;gap:4px;overflow-x:auto;max-width:100%}
+nav{margin-left:auto;display:flex;gap:2px;overflow-x:auto;max-width:100%}
 button{font:inherit;color:inherit;cursor:pointer}
-nav button{background:none;border:0;padding:8px 16px;border-radius:99px;font-weight:600;color:var(--mute);white-space:nowrap;transition:.2s}
+nav button{background:none;border:0;padding:7px 11px;font-size:.93em;border-radius:99px;font-weight:600;color:var(--mute);white-space:nowrap;transition:.2s}
 nav button:hover{color:#fff}nav button[aria-selected=true]{background:#fff;color:#0a1020;box-shadow:0 0 18px #4db3ff88}
 :focus-visible{outline:3px solid var(--card-y);outline-offset:3px}
 main{max-width:1040px;margin:auto;padding:22px 16px 60px}
@@ -373,7 +373,7 @@ const HSget=k=>{try{return JSON.parse(localStorage.getItem("rf_hs_"+k)||"[]")}ca
 /* ---- GLOBAL LEADERBOARD: points = your best score in each game x the game's weight (same weights as in Supabase) ---- */
 const LBW={daily:25,pen:50,fk:40,quiz:20,stad:20,live:20,pred:1,keep:5,keeper:5,dash:5,flap:5,snake:5,tgt:3,mem:1,word:1};
 const submitScore=(k,v)=>{if(!(SB&&me&&LBW[k]&&v>0))return;SB.rpc("submit_score",{p_game:k,p_score:Math.round(v)}).then(()=>{},()=>{});
-if(k!=="pred")SB.rpc("earn_coins",{p_game:k,p_score:Math.round(v)}).then(({data,error})=>{if(error){toast("⚠️ Coins didn't update: "+error.message);return}const r=data&&data[0];if(!r)return;WAL=r.coins;showCoins();toast(r.earned>0?`+${r.earned} 🪙 coins`+(r.capped?" · daily limit reached":""):"Daily coin limit reached. Come back tomorrow!")},()=>{})};// every game also earns Gallery coins
+if(k!=="pred")SB.rpc("earn_coins",{p_game:k,p_score:Math.round(v)}).then(({data,error})=>{if(error){toast("⚠️ Coins didn't update: "+error.message);return}const r=data&&data[0];if(!r)return;WAL=r.coins;showCoins();if(r.earned>0)toast(`+${r.earned} 🪙 coins`)},()=>{})};// every game also earns Gallery coins
 const addHS=(k,v)=>{try{localStorage.setItem("rf_hs_"+k,JSON.stringify([...HSget(k),v].sort((a,b)=>b-a).slice(0,5)))}catch(e){}submitScore(k,v)};
 const showHS=k=>{const e=$("#hs");if(e)e.innerHTML=HSget(k).map((v,i)=>`<div class="hsr"><b>${i+1}</b><span>${v}</span></div>`).join("")||'<p class="empty" style="padding:4px 0">No scores yet</p>'};
 const best=k=>Math.max(0,...HSget(k));
@@ -459,13 +459,16 @@ const added=false;if(!validRoom(m.room))return;if(!seenAt(m.room)&&!isDm){markSe
 /* ---- FRIEND REQUESTS: red dot on the Friends tab when someone adds you and you haven't looked yet ---- */
 let REQ_IDS=[],REQ_NEW=0,reqT=0,MUT=null,MINE=[];
 // "Add friend" next to someone's name in chat: Add friend / Request sent / Accept (they already added you) / nothing if already friends
+// Friend button on Admin > Users: Friends / Request sent / Accept / Add friend
+function adminFriendBtn(u){if(!SB||!me||!u.id||u.id===me.id)return"";if((MUT||[]).includes(u.id))return' <span class="addf done">✓ Friends</span>';if((MINE||[]).includes(u.id))return' <span class="addf done">Request sent</span>';
+return` <button class="addf" data-chatadd="${esc(u.id)}" data-name="${esc(u.name||"Friend")}">${(REQ_IDS||[]).includes(u.id)?"✓ Accept friend":"➕ Add friend"}</button>`}
 function chatAddBtn(m){if(!SB||!me||!m.u||m.u===me.id||!MUT||MUT.includes(m.u))return"";
 if(MINE.includes(m.u))return' <span class="addf done">Request sent</span>';
 return` <button class="addf" data-chatadd="${esc(m.u)}" data-name="${esc(m.n)}">${REQ_IDS.includes(m.u)?"✓ Accept friend":"➕ Add friend"}</button>`}
 async function chatAdd(id,name){if(!(SB&&me))return;FD.names[id]=FD.names[id]||name;const{error}=await SB.from("friendships").insert({user_id:me.id,friend_id:id});
 if(error&&!/duplicate/i.test(error.message)){toast("Couldn't send the request. Try again.");return}
 me.friends=[...FR().filter(f=>f.id!==id),{id,name:name||"Friend"}];SB.auth.updateUser({data:{friends:me.friends}});const wasReq=REQ_IDS.includes(id);
-toast(wasReq?"You and "+name+" are now friends":"Friend request sent to "+name);await checkRequests();FD.loaded=false;if(tab==="chat"){render()}}// MUT = people you and they have both added
+toast(wasReq?"You and "+name+" are now friends":"Friend request sent to "+name);await checkRequests();FD.loaded=false;if(tab==="chat"||tab==="admin"){render()}}// MUT = people you and they have both added
 const chatFriends=()=>MUT?MUT.map(id=>({id,name:fname(id)})):FR().filter(f=>!f.auto);
 const reqSeenKey=()=>"rf_reqseen_"+PK(),reqSeen=()=>{try{return JSON.parse(localStorage.getItem(reqSeenKey())||"[]")}catch(e){return[]}};
 async function checkRequests(){if(!(SB&&me))return;const r=await SB.from("friendships").select("user_id,friend_id");if(r.error||!r.data)return;const mine=r.data.filter(x=>x.user_id===me.id).map(x=>x.friend_id);
@@ -748,7 +751,7 @@ const top=`<div class="gtop"><span class="coins">🪙 <span class="coinv">${WAL=
 if(gsub==="open"&&PULL){const pk=PULL.pack,again=WAL!=null&&WAL>=pk.price;
 return h+top+`<div class="panel" style="text-align:center"><h3>${pk.e} ${esc(pk.n)}</h3><div class="reveal">${PULL.cards.map((c,i)=>{const p=GP.find(x=>x.id===c.player_id);return p?pcard(p,COL[p.id]||1,c.is_new?'<span class="pbadge">NEW!</span>':`<span class="pbadge dup">Duplicate +${c.refund} 🪙</span>`,i*.55):""}).join("")}</div>
 <div class="row" style="justify-content:center;gap:10px;flex-wrap:wrap"><button class="btn" data-pack="${esc(pk.id)}" ${gBusy?"disabled":""}>${again?`Open another · 🪙 ${pk.price}`:`Need 🪙 ${pk.price}`}</button><button class="btn ghost" data-gs="col">See my collection</button><button class="btn ghost" data-gs="packs">All packs</button></div></div>`}
-if(gsub==="packs")return h+top+`<p class="sl">Earn 🪙 coins by playing any game in the Arcade (up to 🪙 1000 a day). Duplicates give some coins back.</p><div class="packs">${PACKS.map(pk=>{const can=WAL!=null&&WAL>=pk.price;return`<div class="panel pk"><div class="pk-e">${pk.e}</div><h3>${esc(pk.n)}</h3><p class="sl" style="margin:2px 0 8px">${esc(pk.d)}</p><div class="odds">${packOdds(pk).map(([k,v])=>`<span>${rarOf(k)[2]} ${rarOf(k)[1]} <b>${v}%</b></span>`).join("")}</div><button class="btn${can?"":" ghost"}" data-pack="${esc(pk.id)}" ${gBusy?"disabled":""}>${gBusy?"Opening…":`Open · 🪙 ${pk.price}`}</button></div>`}).join("")}</div>`;
+if(gsub==="packs")return h+top+`<p class="sl">Earn 🪙 coins by playing any game in the Arcade, with no daily limit. Duplicates give some coins back.</p><div class="packs">${PACKS.map(pk=>{const can=WAL!=null&&WAL>=pk.price;return`<div class="panel pk"><div class="pk-e">${pk.e}</div><h3>${esc(pk.n)}</h3><p class="sl" style="margin:2px 0 8px">${esc(pk.d)}</p><div class="odds">${packOdds(pk).map(([k,v])=>`<span>${rarOf(k)[2]} ${rarOf(k)[1]} <b>${v}%</b></span>`).join("")}</div><button class="btn${can?"":" ghost"}" data-pack="${esc(pk.id)}" ${gBusy?"disabled":""}>${gBusy?"Opening…":`Open · 🪙 ${pk.price}`}</button></div>`}).join("")}</div>`;
 if(gsub==="dbl"){const d=GP.filter(p=>(COL[p.id]||0)>=2).sort((a,b)=>COL[b.id]-COL[a.id]);return h+top+`<p class="sl">Players you have more than one of. Trade them with friends: open a friend in the Friends tab and tap 🔄 Trade doubles. You can only swap a double for a double.</p>${d.length?`<div class="pgrid">${d.map(p=>pcard(p,COL[p.id],`<span class="pbadge dup">${COL[p.id]-1} spare</span>`)).join("")}</div>`:'<p class="sl">No doubles yet. When you get a player you already have from a pack, it shows up here.</p>'}<button class="btn ghost" data-t="friends" style="margin-top:14px">Go to Friends to trade →</button>`}
 const list=GP.filter(p=>gfil==="all"||(gfil==="owned"?COL[p.id]:!COL[p.id]));
 return h+top+`<div class="chips">${[["all","All 100"],["owned",`Collected (${owned})`],["missing",`Missing (${GP.length-owned})`]].map(([k,l])=>`<button class="chip" data-gf="${k}" aria-pressed="${gfil===k}">${l}</button>`).join("")}</div>
@@ -910,7 +913,7 @@ if(asub==="chat")return h+nav+`<div class="chips">${ROOMS.filter(r=>r[0]!=="bot"
 ${m.removed?"":`<div class="aacts"><input id="ar-${m.id}" placeholder="Reason" value="${esc(AV("ar-"+m.id,""))}">${ab("remove:"+m.id,"🗑️ Delete","danger")}<button class="btn ghost" data-auser="${esc(m.name)}">👤 Manage</button></div>`}</div>`).join(""):'<p class="sl">No messages in this room yet.</p>'}</div>`;
 if(asub==="users")return h+nav+`<div class="pass" style="margin:0 0 14px"><input id="aq-users" placeholder="Search by name or email" value="${esc(aQ)}"><button class="btn" data-asearch>Search</button></div>
 ${D.length?D.map(u=>{const st=u.status?`<b class="ust">${u.status==="banned"?"Banned from chat":u.status==="banned_all"?"Banned":u.status==="suspended"?"Suspended until "+new Date(u.until).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"Muted until "+hm(u.until)}</b>${u.reason?` · ${esc(u.reason)}`:""}`:"✅ No restrictions",id=u.id;
-return`<div class="panel"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div class="avatar sm">${esc((u.name||"?")[0].toUpperCase())}</div><div style="flex:1;min-width:180px"><b>${esc(u.name)}</b>${u.is_admin?' <span class="adminbadge">ADMIN</span>':""}<small class="sl" style="display:block;margin:0">${esc(u.email||"")} · joined ${new Date(u.created_at).toLocaleDateString("en-GB")} · last sign-in ${u.last_sign_in_at?ago(u.last_sign_in_at):"never"}</small></div></div>
+return`<div class="panel"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div class="avatar sm">${esc((u.name||"?")[0].toUpperCase())}</div><div style="flex:1;min-width:180px"><b>${esc(u.name)}</b>${u.is_admin?' <span class="adminbadge">ADMIN</span>':""}${adminFriendBtn(u)}<small class="sl" style="display:block;margin:0">${esc(u.email||"")} · joined ${new Date(u.created_at).toLocaleDateString("en-GB")} · last sign-in ${u.last_sign_in_at?ago(u.last_sign_in_at):"never"}</small></div></div>
 <p class="sl">💬 ${u.messages} messages · 🚩 ${u.open_reports} open reports · ⚠️ ${u.strikes_30d} strikes (30 days) · ${st}</p>
 ${u.is_admin?'<p class="sl">Administrators can\'t be restricted.</p>':`<input id="ur-${id}" class="ainput" placeholder="Reason / warning message (needed for every action)" value="${esc(AV("ur-"+id,""))}">
 <div class="aacts"><button class="btn" data-ado="warn:${id}">⚠️ Send warning</button>${ab(`restrict:${id}:timeout:15`,"🔇 Mute 15 min")}${ab(`restrict:${id}:timeout:60`,"🔇 Mute 1 h")}${ab(`restrict:${id}:timeout:1440`,"🔇 Mute 24 h")}${ab(`restrict:${id}:chat_ban`,"💬 Ban from chat","danger")}</div>
