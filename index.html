@@ -1229,6 +1229,8 @@ You have|Tem|Tienes
 New for you|Novo para si|Nuevo para ti
 Pick 1 to 5 doubles on each side. The numbers don't have to match. You both keep at least one of every player.|Escolha 1 a 5 repetidos de cada lado. Os números não têm de ser iguais. Ambos ficam com pelo menos um de cada jogador.|Elige de 1 a 5 repetidos en cada lado. No tienen que ser los mismos. Los dos os quedáis con al menos uno de cada jugador.
 Pick at least one on each side|Escolha pelo menos um de cada lado|Elige al menos uno en cada lado
+has|tem|tiene
+New for|Novo para|Nuevo para
 Admins|Admins|Admins`;
 TRX.split("\n").forEach(l=>{const p=l.split("|");if(p.length===3)DICT[p[0]]=[p[1],p[2]]});
 // Phrases with numbers or times in them
@@ -1396,11 +1398,14 @@ function tradeBuilder(){const id=trSel&&trSel.to;if(!id)return"";const P=FD.prof
 if(!P){loadFriend(id);return'<p class="sl">Loading…</p>'}if(!gTried){loadGallery().then(()=>{if(tab==="friends")render()});return'<p class="sl">Loading your players…</p>'}
 const fc=pid=>(P.g.find(c=>c.player_id===pid)||{}).copies||0,myD=GP.filter(p=>(COL[p.id]||0)>=2),hisD=GP.filter(p=>fc(p.id)>=2),g=trSel.give,w=trSel.get,ok=g.length>0&&w.length>0;
 const pick=(p,sel,attr,n,own)=>`<button class="pick${sel?" sel":""}" ${attr}="${p.id}" aria-pressed="${sel}" aria-label="${esc(p.name)}, ${n} copies${own==null?"":own?", you have "+own:", new for you"}">${pcard(p,n)}${own==null?"":own?`<span class="own">✓ ${L("You have")} <b>${own}</b></span>`:`<span class="own new">\u{1F195} ${L("New for you")}</span>`}</button>`;
+// your doubles: does your friend have this player? (players they don't have come first)
+const theirs=(p,sel,n)=>{const h=fc(p.id);return pick(p,sel,"data-tg",n).replace(/<\/button>$/,h?`<span class="own">✓ <span data-notr>${nm}</span> ${L("has")} <b>${h}</b></span></button>`:`<span class="own new">\u{1F195} ${L("New for")} <span data-notr>${nm}</span></span></button>`)};
+myD.sort((a,b)=>(fc(a.id)>0)-(fc(b.id)>0));
 // friend's doubles: players you don't have yet come first
 hisD.sort((a,b)=>((COL[a.id]||0)>0)-((COL[b.id]||0)>0));
 return `<div class="row" style="justify-content:flex-start;margin:0 0 12px"><button class="back" data-fview="${esc(id)}">← Back to ${nm}</button></div>
 <div class="panel"><h3>🔄 Trade doubles with ${nm}</h3><p class="sl" style="margin-top:2px">Pick 1 to 5 doubles on each side. The numbers don't have to match. You both keep at least one of every player.</p>
-<h3 style="margin-top:14px">You give <small class="hint">${g.length}/5 picked</small></h3>${myD.length?`<div class="pgrid">${myD.map(p=>pick(p,g.includes(p.id),"data-tg",COL[p.id])).join("")}</div>`:'<p class="sl">You don\'t have any doubles yet. Duplicates from packs show up in Gallery → My doubles.</p>'}
+<h3 style="margin-top:14px">You give <small class="hint">${g.length}/5 picked</small></h3>${myD.length?`<div class="pgrid">${myD.map(p=>theirs(p,g.includes(p.id),COL[p.id])).join("")}</div>`:'<p class="sl">You don\'t have any doubles yet. Duplicates from packs show up in Gallery → My doubles.</p>'}
 <h3 style="margin-top:18px">You get <small class="hint">${w.length}/5 picked</small></h3>${hisD.length?`<div class="pgrid">${hisD.map(p=>pick(p,w.includes(p.id),"data-tw",fc(p.id),COL[p.id]||0)).join("")}</div>`:`<p class="sl">${nm} doesn't have any doubles right now.</p>`}
 <div class="tsum">${g.length||w.length?`<p>You give ${cardChips(g)||"—"}</p><p>You get ${cardChips(w)||"—"}</p>`:""}<button class="btn" data-tsend ${ok&&!trBusy?"":"disabled"}>${trBusy?"Sending…":ok?`Send offer (${g.length} for ${w.length})`:"Pick at least one on each side"}</button><p class="sl" role="status">${trMsg}</p></div></div>`}
 async function sendTrade(){if(!trSel||trBusy)return;trBusy=true;trMsg="";render();const{error}=await SB.rpc("propose_trade",{p_to:trSel.to,p_give:trSel.give,p_get:trSel.get});trBusy=false;
