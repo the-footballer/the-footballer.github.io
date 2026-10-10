@@ -367,7 +367,11 @@ const pickM=(list,mm,n,newest)=>{const by=newest?(a,b)=>new Date(b.t||0)-new Dat
 const byDay=(list,row)=>{let last="";return list.map(x=>{const d=x.t?day(x.t):"Matchday "+(x.md||"");const h=d!==last?`<p class="sl dayh">${d}</p>`:"";last=d;return h+row(x)}).join("")};
 const fxRow=x=>`<div class="fx"><span>${team(x.h)}</span><b>${hm(x.t)}</b><span>${team(x.a)}</span><small>${LGS_(x.c)}</small></div>`;
 const resRow=x=>`<div class="fx"><span>${team(x.h)}</span><b>${x.hs}-${x.as}</b><span>${team(x.a)}</span><small>${LGS_(x.c)}</small></div>`;
-const liveRow=x=>`<div class="fx"><span>${team(x.h)}</span><b class="lv">${x.hs} - ${x.as}</b><span>${team(x.a)}</span><small>${esc(x.min||"LIVE")} · ${LGS_(x.c)}</small></div>`;
+// Minutes played in a live match. The free scores plan rarely sends the minute, so it is worked out from kick-off (15 minute half-time) and ticks every 30 seconds.
+const liveMin=x=>{if(x.min&&x.min!=="LIVE")return x.min;const m=Math.floor((Date.now()-new Date(x.t))/6e4)+1;if(isNaN(m)||m<1)return"LIVE";if(m<=45)return m+"'";if(m<=62)return"45+'";const s2=m-17;return s2<=90?s2+"'":"90+'"};
+const lvSpan=x=>`<span data-lvk="${esc(x.t)}" data-lvm="${esc(x.min||"")}">${esc(liveMin(x))}</span>`;
+setInterval(()=>document.querySelectorAll("[data-lvk]").forEach(e=>{const v=liveMin({t:e.dataset.lvk,min:e.dataset.lvm});if(e.textContent!==v)e.textContent=v}),30000);
+const liveRow=x=>`<div class="fx"><span>${team(x.h)}</span><b class="lv">${x.hs} - ${x.as}</b><span>${team(x.a)}</span><small>${lvSpan(x)} · ${LGS_(x.c)}</small></div>`;
 const tbl=t=>`<table><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>${t.map((x,i)=>`<tr><td>${i+1}</td><td>${team(x[0])}</td><td>${x[1]+x[2]+x[3]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td><td>${x[5]==null?"-":x[5]}</td><td><b>${x[4]}</b></td></tr>`).join("")}</table>`;
 const HSget=k=>{try{return JSON.parse(localStorage.getItem("rf_hs_"+k)||"[]")}catch(e){return[]}};
 /* ---- GLOBAL LEADERBOARD: points = your best score in each game x the game's weight (same weights as in Supabase) ---- */
@@ -400,7 +404,7 @@ let voteErr="";
 function voteBar(x){const c=VC[x.id]||{h:0,d:0,a:0},n=c.h+c.d+c.a,pc=k=>n?Math.round(c[k]*100/n):0,my=MYV[x.id],open=x.st==="up";if(!open&&!n)return"";
 const b=(k,label)=>`<button class="vbtn${my===k?" on":""}" ${open?`data-vote="${esc(x.id)}|${k}"`:"disabled"} style="--p:${pc(k)}%" aria-label="${esc(label)}: ${pc(k)} percent"><span>${esc(label)}</span><b>${n?pc(k)+"%":""}</b></button>`;
 return `<div class="vote">${b("h",x.h)}${b("d","Draw")}${b("a",x.a)}</div><small class="vn">${n?`${n} vote${n>1?"s":""}`:"Who will win? Be the first to vote"}${my?" · you voted "+(my==="d"?"draw":esc(my==="h"?x.h:x.a)):""}${open?"":" · voting closed"}</small>`}
-const dayRow=x=>`<div class="mrow"><div class="fx"><span>${team(x.h)}</span>${x.st==="up"?`<b>${hm(x.t)}</b>`:x.st==="live"?`<b class="lv">${x.hs} - ${x.as}</b>`:`<b>${x.hs} - ${x.as}</b>`}<span>${team(x.a)}</span><small class="${x.st==="live"?"lvt":""}">${x.st==="up"?"":x.st==="live"?esc(x.min||"LIVE"):"FT"}</small></div>${venueOf(x)?`<small class="venue">🏟️ ${esc(venueOf(x))}</small>`:""}${x.st==="ft"?"":voteBar(x)}</div>`;
+const dayRow=x=>`<div class="mrow"><div class="fx"><span>${team(x.h)}</span>${x.st==="up"?`<b>${hm(x.t)}</b>`:x.st==="live"?`<b class="lv">${x.hs} - ${x.as}</b>`:`<b>${x.hs} - ${x.as}</b>`}<span>${team(x.a)}</span><small class="${x.st==="live"?"lvt":""}">${x.st==="up"?"":x.st==="live"?lvSpan(x):"FT"}</small></div>${venueOf(x)?`<small class="venue">🏟️ ${esc(venueOf(x))}</small>`:""}${x.st==="ft"?"":voteBar(x)}</div>`;
 function matches(){if(msub!=="lg")msub="fix";const mine=!!PREF();let c="";
 const none=t=>`<p style="color:var(--mute)">${t}</p>`;
 // One list per league; used for "Your matches" and for "All other matches"
@@ -549,7 +553,7 @@ async function pred(){const b=$("#board");if(b)b.innerHTML='<p class="sl">Loadin
 function pRender(){const b=$("#board");if(!b||curGame!=="pred")return;const tot=predTotal(),now=Date.now(),fut=DATA.fx.filter(x=>new Date(x.t)>now);
 const up=(PREF()?[...fut.filter(isMyMatch),...pickM(fut.filter(x=>!isMyMatch(x)),"big",8)]:pickM(fut,"big",12)).slice(0,12),done=DATA.res.filter(r=>PRED[r.id]&&r.hs!=null).slice(0,10);
 const h=$("#hs");if(h)h.innerHTML=`<div class="hsr"><b>Points</b><span>${tot}</span></div>`;submitScore("pred",tot);
-b.innerHTML=`<span class="tag">Your points: ${tot}</span>${me?"":'<p class="sl">Saved on this device. Sign in to keep your predictions on every device.</p>'}<h3 style="margin:10px 0 4px">Upcoming</h3>${up.map(x=>{const p=PRED[x.id]||["",""];return`<div class="pr"><small>${day(x.t)} ${hm(x.t)} · ${LGN(x.c)||""}</small><div class="prr"><span>${team(x.h)}</span><input type="number" min="0" max="20" inputmode="numeric" data-ph="${esc(x.id)}" value="${p[0]}" aria-label="${esc(x.h)} goals"><input type="number" min="0" max="20" inputmode="numeric" data-pa="${esc(x.id)}" value="${p[1]}" aria-label="${esc(x.a)} goals"><span>${team(x.a)}</span></div></div>`}).join("")||'<p class="sl">No upcoming matches yet.</p>'}${up.length?'<button class="btn" data-psv style="margin-top:12px">Save predictions</button>':""}${(()=>{const done=new Set(DATA.res.map(r=>r.id)),lv=new Map(DATA.live.map(x=>[x.id,x])),closed=[...DATA.live,...DATA.fx].filter((x,i,a)=>PRED[x.id]&&new Date(x.t)<=now&&!done.has(x.id)&&a.findIndex(y=>y.id===x.id)===i);return closed.length?`<h3 style="margin:14px 0 4px">🔒 Closed at kick-off</h3>${closed.map(x=>{const p=PRED[x.id],l=lv.get(x.id);return`<div class="fx" style="grid-template-columns:1fr auto 1fr 128px"><span>${team(x.h)}</span><b class="${l?"lv":""}">${l?`${l.hs} - ${l.as}`:hm(x.t)}</b><span>${team(x.a)}</span><small>You ${p[0]}-${p[1]} · ${l?esc(l.min||"LIVE"):"waiting for result"}</small></div>`}).join("")}`:""})()}<p id="prmsg" class="sl" role="status">${predMsg}</p>${done.length?`<h3 style="margin:14px 0 4px">Your results</h3>${done.map(r=>{const p=PRED[r.id];return`<div class="fx" style="grid-template-columns:1fr auto 1fr 128px"><span>${esc(r.h)}</span><b>${r.hs}-${r.as}</b><span>${esc(r.a)}</span><small>You ${p[0]}-${p[1]} · +${predPts(p,r)}${predPts(p,r)?` · 🪙${predPts(p,r)/2}`:""}</small></div>`}).join("")}`:""}`}
+b.innerHTML=`<span class="tag">Your points: ${tot}</span>${me?"":'<p class="sl">Saved on this device. Sign in to keep your predictions on every device.</p>'}<h3 style="margin:10px 0 4px">Upcoming</h3>${up.map(x=>{const p=PRED[x.id]||["",""];return`<div class="pr"><small>${day(x.t)} ${hm(x.t)} · ${LGN(x.c)||""}</small><div class="prr"><span>${team(x.h)}</span><input type="number" min="0" max="20" inputmode="numeric" data-ph="${esc(x.id)}" value="${p[0]}" aria-label="${esc(x.h)} goals"><input type="number" min="0" max="20" inputmode="numeric" data-pa="${esc(x.id)}" value="${p[1]}" aria-label="${esc(x.a)} goals"><span>${team(x.a)}</span></div></div>`}).join("")||'<p class="sl">No upcoming matches yet.</p>'}${up.length?'<button class="btn" data-psv style="margin-top:12px">Save predictions</button>':""}${(()=>{const done=new Set(DATA.res.map(r=>r.id)),lv=new Map(DATA.live.map(x=>[x.id,x])),closed=[...DATA.live,...DATA.fx].filter((x,i,a)=>PRED[x.id]&&new Date(x.t)<=now&&!done.has(x.id)&&a.findIndex(y=>y.id===x.id)===i);return closed.length?`<h3 style="margin:14px 0 4px">🔒 Closed at kick-off</h3>${closed.map(x=>{const p=PRED[x.id],l=lv.get(x.id);return`<div class="fx" style="grid-template-columns:1fr auto 1fr 128px"><span>${team(x.h)}</span><b class="${l?"lv":""}">${l?`${l.hs} - ${l.as}`:hm(x.t)}</b><span>${team(x.a)}</span><small>You ${p[0]}-${p[1]} · ${l?lvSpan(l):"waiting for result"}</small></div>`}).join("")}`:""})()}<p id="prmsg" class="sl" role="status">${predMsg}</p>${done.length?`<h3 style="margin:14px 0 4px">Your results</h3>${done.map(r=>{const p=PRED[r.id];return`<div class="fx" style="grid-template-columns:1fr auto 1fr 128px"><span>${esc(r.h)}</span><b>${r.hs}-${r.as}</b><span>${esc(r.a)}</span><small>You ${p[0]}-${p[1]} · +${predPts(p,r)}${predPts(p,r)?` · 🪙${predPts(p,r)/2}`:""}</small></div>`}).join("")}`:""}`}
 async function predSave(){const now=Date.now(),rows=[];document.querySelectorAll("[data-ph]").forEach(i=>{const id=i.dataset.ph,a=document.querySelector(`[data-pa="${CSS.escape(id)}"]`),f=DATA.fx.find(x=>x.id===id);if(!f||!a||i.value===""||a.value===""||new Date(f.t)<=now)return;const hh=Math.min(20,Math.max(0,parseInt(i.value)||0)),aa=Math.min(20,Math.max(0,parseInt(a.value)||0));rows.push({id,hh,aa,t:f.t})});
 if(!rows.length){predMsg="Type a score for at least one match first.";return pRender()}
 if(SB&&me){const{error}=await SB.from("predictions").upsert(rows.map(r=>({user_id:me.id,match_id:r.id,home:r.hh,away:r.aa,kickoff:r.t})),{onConflict:"user_id,match_id"});if(error){predMsg="Couldn't save. "+(/relation|does not exist/i.test(error.message)?"The predictions table isn't set up in Supabase yet.":"Check your connection and try again.");return pRender()}}
@@ -686,16 +690,496 @@ const PRE=[["Blue","#4db3ff","#1b4fd8"],["Green","#3ddc84","#14804a"],["Red","#f
 const LANGS=[["en","English"],["pt","Português"],["es","Español"]];
 const DICT={"News":["Notícias","Noticias"],"Matches":["Jogos","Partidos"],"Tutorials":["Tutoriais","Tutoriales"],"Saved":["Guardados","Guardados"],"Sign in":["Entrar","Iniciar sesión"],"Settings":["Definições","Ajustes"],"Fixtures":["Calendário","Calendario"],"Tables":["Tabelas","Tablas"],"Leaderboard":["Ranking","Clasificación"],"Appearance":["Aspeto","Apariencia"],"Accent colour":["Cor de destaque","Color de acento"],"Mode":["Modo","Modo"],"Dark":["Escuro","Oscuro"],"Light":["Claro","Claro"],"Auto":["Automático","Automático"],"Text size":["Tamanho do texto","Tamaño del texto"],"Language":["Idioma","Idioma"],"Menus and headings change language. News and match data stay in English.":["Os menus e títulos mudam de idioma. As notícias e os dados dos jogos ficam em inglês.","Los menús y títulos cambian de idioma. Las noticias y los datos de partidos siguen en inglés."],"Preferences":["Preferências","Preferencias"],"News ticker":["Faixa de notícias","Cinta de noticias"],"Animations":["Animações","Animaciones"],"Start page":["Página inicial","Página de inicio"],"Account":["Conta","Cuenta"],"Sign out":["Terminar sessão","Cerrar sesión"],"Delete account":["Apagar conta","Eliminar cuenta"],"Yes, delete":["Sim, apagar","Sí, eliminar"],"Cancel":["Cancelar","Cancelar"],"You are not signed in.":["Não iniciou sessão.","No has iniciado sesión."],"Data":["Dados","Datos"],"Clear saved stories":["Limpar notícias guardadas","Borrar noticias guardadas"],"Clear arcade scores":["Limpar pontuações","Borrar puntuaciones"],"Reset settings":["Repor definições","Restablecer ajustes"],"About":["Acerca","Acerca de"],"Not affiliated with any club, league or media outlet.":["Sem ligação a clubes, ligas ou meios de comunicação.","Sin vinculación con clubes, ligas ni medios."],"On":["Ligado","Activado"],"Off":["Desligado","Desactivado"],"My account":["A minha conta","Mi cuenta"],"Saved stories":["Notícias guardadas","Noticias guardadas"],"Welcome":["Bem-vindo","Bienvenido"],"Tutorial videos":["Vídeos tutoriais","Vídeos tutoriales"],"From YouTube":["Do YouTube","De YouTube"],"Interactive drills":["Exercícios interativos","Ejercicios interactivos"]};
 const L=t=>ST.lang==="en"?t:((DICT[t]||[])[ST.lang==="pt"?0:1]||t);
-function translateDom(){document.querySelectorAll("nav button:not([data-t=account]),main h2,main h3,main .chip,main .btn,main th").forEach(e=>{if(e.children.length)return;const en=e.dataset.en||(e.dataset.en=e.textContent.trim()),v=L(en);if(v&&e.textContent.trim()!==v)e.textContent=v})}
+/* ---- LANGUAGE: English | Português | Español. Every piece of the site's own text is swapped as it appears on screen.
+   News stories, chat messages, player and club names stay as they are. One line per phrase: English|Portuguese|Spanish ---- */
+const TRX=`News|Notícias|Noticias
+Matches|Jogos|Partidos
+Tables|Tabelas|Clasificaciones
+Chat|Chat|Chat
+Friends|Amigos|Amigos
+Tutorials|Tutoriais|Tutoriales
+Arcade|Arcada|Arcade
+Gallery|Galeria|Galería
+Saved|Guardados|Guardados
+Settings|Definições|Ajustes
+Admin|Admin|Admin
+More|Mais|Más
+Language|Idioma|Idioma
+The site's own words change language. News stories, chat messages and player names stay as they are.|O texto do site muda de idioma. As notícias, as mensagens do chat e os nomes dos jogadores ficam como estão.|Los textos del sitio cambian de idioma. Las noticias, los mensajes del chat y los nombres de jugadores se quedan como están.
+Welcome to The Footballer|Bem-vindo ao The Footballer|Bienvenido a The Footballer
+Sign in or create a free account to continue.|Entre ou crie uma conta grátis para continuar.|Inicia sesión o crea una cuenta gratis para continuar.
+Create account|Criar conta|Crear cuenta
+Forgot password?|Esqueceu-se da palavra-passe?|¿Olvidaste tu contraseña?
+Back to sign in|Voltar a entrar|Volver a iniciar sesión
+Your account works on any phone or computer.|A sua conta funciona em qualquer telemóvel ou computador.|Tu cuenta funciona en cualquier móvil u ordenador.
+What's inside The Footballer|O que há no The Footballer|Qué hay en The Footballer
+Football news|Notícias de futebol|Noticias de fútbol
+from BBC Sport, The Guardian, Sky Sports and more, picked for your clubs|da BBC Sport, The Guardian, Sky Sports e mais, escolhidas para os seus clubes|de BBC Sport, The Guardian, Sky Sports y más, elegidas para tus clubes
+Live scores, fixtures and tables|Resultados ao vivo, calendário e tabelas|Resultados en directo, calendario y clasificaciones
+for the Premier League, Champions League, La Liga, Serie A, Bundesliga, Ligue 1 and Liga Portugal|da Premier League, Liga dos Campeões, La Liga, Serie A, Bundesliga, Ligue 1 e Liga Portugal|de la Premier League, Champions League, LaLiga, Serie A, Bundesliga, Ligue 1 y Liga Portugal
+Arcade games|Jogos da arcada|Juegos arcade
+: penalty shootouts, the daily Who Am I? and quizzes, with a global leaderboard|: penáltis, o Quem Sou Eu? diário e quizzes, com um ranking mundial|: penaltis, el ¿Quién soy? diario y preguntas, con una clasificación mundial
+Collect 100 players|Colecione 100 jogadores|Colecciona 100 jugadores
+by opening packs, and trade doubles with friends|abrindo pacotes, e troque repetidos com amigos|abriendo sobres, e intercambia repetidos con amigos
+and match votes|e votações dos jogos|y votaciones de partidos
+with other fans and your friends|com outros adeptos e os seus amigos|con otros aficionados y tus amigos
+Free to use. Not affiliated with any club, league or media outlet.|Grátis. Sem ligação a clubes, ligas ou meios de comunicação.|Gratis. Sin vinculación con clubes, ligas ni medios.
+Email|Email|Correo
+Password (8+ characters)|Palavra-passe (8+ caracteres)|Contraseña (8+ caracteres)
+Password|Palavra-passe|Contraseña
+Confirm password|Confirmar palavra-passe|Confirmar contraseña
+Type your password again|Escreva a palavra-passe outra vez|Escribe la contraseña otra vez
+Your name|O seu nome|Tu nombre
+Send reset link|Enviar link de recuperação|Enviar enlace
+Email or password is incorrect.|Email ou palavra-passe incorretos.|Correo o contraseña incorrectos.
+Enter a valid email.|Escreva um email válido.|Escribe un correo válido.
+Enter your name.|Escreva o seu nome.|Escribe tu nombre.
+Password must be at least 8 characters.|A palavra-passe precisa de pelo menos 8 caracteres.|La contraseña debe tener al menos 8 caracteres.
+The two passwords don't match. Please type them again.|As palavras-passe não coincidem. Escreva-as outra vez.|Las contraseñas no coinciden. Escríbelas otra vez.
+That email already has an account. Sign in instead.|Esse email já tem conta. Entre em vez disso.|Ese correo ya tiene cuenta. Inicia sesión.
+Please confirm your email first. Check your inbox.|Confirme primeiro o seu email. Veja a caixa de entrada.|Confirma primero tu correo. Revisa tu bandeja de entrada.
+Almost done! Check your email and click the link to confirm your account.|Quase! Veja o seu email e clique no link para confirmar a conta.|¡Casi! Revisa tu correo y pulsa el enlace para confirmar tu cuenta.
+Check your email for a link to reset your password.|Veja o seu email: enviámos um link para mudar a palavra-passe.|Revisa tu correo: te enviamos un enlace para cambiar la contraseña.
+Choose a password that is different from your old one.|Escolha uma palavra-passe diferente da antiga.|Elige una contraseña distinta de la anterior.
+Can't reach the account server. Check your connection and try again.|Não foi possível ligar ao servidor. Verifique a ligação e tente outra vez.|No se puede conectar con el servidor. Revisa tu conexión e inténtalo otra vez.
+This account is suspended or banned.|Esta conta está suspensa ou banida.|Esta cuenta está suspendida o bloqueada.
+Your account is banned.|A sua conta está banida.|Tu cuenta está bloqueada.
+⭐ Your news|⭐ As suas notícias|⭐ Tus noticias
+Your news|As suas notícias|Tus noticias
+All news|Todas as notícias|Todas las noticias
+LATEST|ÚLTIMAS|ÚLTIMAS
+MATCHES|JOGOS|PARTIDOS
+MORE NEWS|MAIS NOTÍCIAS|MÁS NOTICIAS
+All|Todas|Todas
+Champions League|Liga dos Campeões|Champions League
+Read story|Ler notícia|Leer noticia
+Tap to read on The Footballer|Toque para ler no The Footballer|Toca para leer en The Footballer
+This source only shares the headline.|Esta fonte só partilha o título.|Esta fuente solo comparte el titular.
+Share in chat|Partilhar no chat|Compartir en el chat
+💬 Share in chat|💬 Partilhar no chat|💬 Compartir en el chat
+Shared in General chat|Partilhado no chat geral|Compartido en el chat general
+No stories in this section right now.|Não há notícias nesta secção agora.|No hay noticias en esta sección ahora.
+Nothing saved yet. Tap ☆ on any news story to keep it here.|Ainda nada guardado. Toque em ☆ numa notícia para a guardar aqui.|Nada guardado todavía. Toca ☆ en una noticia para guardarla aquí.
+No saved articles yet.|Ainda não há artigos guardados.|Todavía no hay artículos guardados.
+Saved stories|Notícias guardadas|Noticias guardadas
+Saved stories:|Notícias guardadas:|Noticias guardadas:
+Go to News|Ir para Notícias|Ir a Noticias
+Story hidden for everyone|Notícia escondida para todos|Noticia oculta para todos
+🙈 Hide this story|🙈 Esconder esta notícia|🙈 Ocultar esta noticia
+← Back|← Voltar|← Volver
+Back|Voltar|Volver
+Today|Hoje|Hoy
+Yesterday|Ontem|Ayer
+Tomorrow|Amanhã|Mañana
+LIVE|AO VIVO|EN DIRECTO
+Live|Ao vivo|En directo
+Draw|Empate|Empate
+Full time!|Fim do jogo!|¡Final del partido!
+FT|FIM|FIN
+HT|INT|DESC
+Upcoming|Próximos|Próximos
+Results|Resultados|Resultados
+Who will win? Be the first to vote|Quem vai ganhar? Seja o primeiro a votar|¿Quién ganará? Sé el primero en votar
+No matches on this day.|Não há jogos neste dia.|No hay partidos este día.
+No upcoming matches yet.|Ainda não há próximos jogos.|Todavía no hay próximos partidos.
+No upcoming matches in the next few days.|Não há jogos nos próximos dias.|No hay partidos en los próximos días.
+None of your teams or leagues play on this day.|Nenhuma das suas equipas ou ligas joga neste dia.|Ninguno de tus equipos o ligas juega este día.
+⭐ Your matches|⭐ Os seus jogos|⭐ Tus partidos
+Your matches|Os seus jogos|Tus partidos
+Your results|Os seus resultados|Tus resultados
+Tip:|Dica:|Consejo:
+pick your teams|escolha as suas equipas|elige tus equipos
+to see your matches at the top.|para ver os seus jogos no topo.|para ver tus partidos arriba.
+Team|Equipa|Equipo
+GD|DG|DG
+Pts|Pts|Pts
+P|J|PJ
+W|V|G
+D|E|E
+L|D|P
+League leaders|Líderes das ligas|Líderes de las ligas
+Live chat: messages appear for everyone instantly. Private chats are only visible to you and your friend.|Chat ao vivo: as mensagens aparecem logo para todos. As conversas privadas só são vistas por si e pelo seu amigo.|Chat en directo: los mensajes aparecen al instante para todos. Los chats privados solo los veis tú y tu amigo.
+Rooms|Salas|Salas
+💬 General chat|💬 Chat geral|💬 Chat general
+General chat|Chat geral|Chat general
+🤖 The Footballer Bot|🤖 Bot do The Footballer|🤖 Bot de The Footballer
+Ask me about the table, the leader or the next match.|Pergunte-me pela tabela, pelo líder ou pelo próximo jogo.|Pregúntame por la clasificación, el líder o el próximo partido.
+Pick a room or a friend:|Escolha uma sala ou um amigo:|Elige una sala o un amigo:
+No friends yet. Add one by email:|Ainda sem amigos. Adicione um por email:|Todavía no tienes amigos. Añade uno por correo:
+Add|Adicionar|Añadir
+Add friend|Adicionar amigo|Añadir amigo
+➕ Add friend|➕ Adicionar amigo|➕ Añadir amigo
+✓ Accept friend|✓ Aceitar amigo|✓ Aceptar amigo
+✓ Friends|✓ Amigos|✓ Amigos
+Request sent|Pedido enviado|Solicitud enviada
+No messages yet. Say hello!|Ainda não há mensagens. Diga olá!|Todavía no hay mensajes. ¡Saluda!
+No messages in this room yet.|Ainda não há mensagens nesta sala.|Todavía no hay mensajes en esta sala.
+Send|Enviar|Enviar
+Message|Mensagem|Mensaje
+Friend's email|Email do amigo|Correo del amigo
+Sign in to join match rooms and message friends.|Entre para usar as salas e falar com amigos.|Inicia sesión para entrar en las salas y escribir a amigos.
+Message not sent.|Mensagem não enviada.|Mensaje no enviado.
+Message not sent. Check your connection and try again.|Mensagem não enviada. Verifique a ligação e tente outra vez.|Mensaje no enviado. Revisa tu conexión e inténtalo otra vez.
+Chat is being upgraded. Try again in a minute.|O chat está a ser atualizado. Tente daqui a um minuto.|El chat se está actualizando. Inténtalo en un minuto.
+Demo mode: messages stay on this device.|Modo demo: as mensagens ficam neste dispositivo.|Modo demo: los mensajes se quedan en este dispositivo.
+You are banned from chat.|Está banido do chat.|Estás bloqueado en el chat.
+Message deleted|Mensagem apagada|Mensaje eliminado
+Message hidden|Mensagem escondida|Mensaje oculto
+🚫 This message was removed by a moderator|🚫 Esta mensagem foi removida por um moderador|🚫 Un moderador eliminó este mensaje
+🚩 Report|🚩 Denunciar|🚩 Denunciar
+🔇 Mute|🔇 Silenciar|🔇 Silenciar
+🔊 Unmute|🔊 Deixar de silenciar|🔊 Quitar silencio
+⛔ Block|⛔ Bloquear|⛔ Bloquear
+✅ Unblock|✅ Desbloquear|✅ Desbloquear
+Why are you reporting this?|Porque está a denunciar isto?|¿Por qué denuncias esto?
+Abuse|Abuso|Abuso
+Bullying|Bullying|Acoso
+Hate|Ódio|Odio
+Threat|Ameaça|Amenaza
+Spam|Spam|Spam
+Personal info|Dados pessoais|Datos personales
+Other|Outro|Otro
+Thanks. The admins will review it.|Obrigado. Os admins vão analisar.|Gracias. Los administradores lo revisarán.
+Couldn't send the report.|Não foi possível enviar a denúncia.|No se pudo enviar la denuncia.
+Couldn't send the report. Try again.|Não foi possível enviar a denúncia. Tente outra vez.|No se pudo enviar la denuncia. Inténtalo otra vez.
+Muted. You won't see their messages.|Silenciado. Não vai ver as mensagens dessa pessoa.|Silenciado. No verás sus mensajes.
+Blocked. They can't message you privately and their messages are hidden.|Bloqueado. Não lhe pode enviar mensagens privadas e as mensagens dessa pessoa ficam escondidas.|Bloqueado. No puede escribirte en privado y sus mensajes quedan ocultos.
+⚠️ A message from The Footballer admins|⚠️ Uma mensagem dos admins do The Footballer|⚠️ Un mensaje de los administradores de The Footballer
+I understand|Compreendo|Entendido
+📰 Feed|📰 Atividade|📰 Actividad
+🔄 Trades|🔄 Trocas|🔄 Intercambios
+Friend requests|Pedidos de amizade|Solicitudes de amistad
+wants to be your friend|quer ser seu amigo|quiere ser tu amigo
+Accept|Aceitar|Aceptar
+Decline|Recusar|Rechazar
+Request declined|Pedido recusado|Solicitud rechazada
+My friends|Os meus amigos|Mis amigos
+← All friends|← Todos os amigos|← Todos los amigos
+View stats|Ver estatísticas|Ver estadísticas
+Unfriend|Remover amigo|Eliminar amigo
+Yes, unfriend|Sim, remover|Sí, eliminar
+Waiting for them to add you back|À espera que o adicione também|Esperando a que te añada
+Their stats appear once they add you too.|As estatísticas aparecem quando também o adicionar.|Sus estadísticas aparecen cuando también te añada.
+Add friends (and get them to add you back) to see what they're up to.|Adicione amigos (e peça que o adicionem também) para ver o que andam a fazer.|Añade amigos (y pide que te añadan) para ver qué hacen.
+Nothing yet. When your friends vote, read articles, open packs or play games, it shows up here.|Ainda nada. Quando os seus amigos votarem, lerem notícias, abrirem pacotes ou jogarem, aparece aqui.|Nada todavía. Cuando tus amigos voten, lean noticias, abran sobres o jueguen, aparecerá aquí.
+No friends yet. Add someone by email below. Once you've both added each other you'll see their stats here.|Ainda sem amigos. Adicione alguém por email abaixo. Quando se adicionarem um ao outro, vê aqui as estatísticas.|Todavía no tienes amigos. Añade a alguien por correo abajo. Cuando os hayáis añadido, verás aquí sus estadísticas.
+Loading your friends…|A carregar os seus amigos…|Cargando tus amigos…
+Couldn't load your friends. Check your connection.|Não foi possível carregar os amigos. Verifique a ligação.|No se pudieron cargar tus amigos. Revisa tu conexión.
+Enter a friend's email address.|Escreva o email do amigo.|Escribe el correo de tu amigo.
+Nobody on The Footballer uses that email.|Ninguém no The Footballer usa esse email.|Nadie en The Footballer usa ese correo.
+Couldn't add friend. Try again.|Não foi possível adicionar. Tente outra vez.|No se pudo añadir. Inténtalo otra vez.
+Couldn't send the request. Try again.|Não foi possível enviar o pedido. Tente outra vez.|No se pudo enviar la solicitud. Inténtalo otra vez.
+Go to chat|Ir para o chat|Ir al chat
+🔄 Trade doubles|🔄 Trocar repetidos|🔄 Intercambiar repetidos
+Offers for you|Propostas para si|Ofertas para ti
+Offers you sent|Propostas enviadas|Ofertas enviadas
+No offers right now.|Não há propostas agora.|No hay ofertas ahora.
+No offers waiting. Open a friend's page and tap 🔄 Trade doubles.|Sem propostas. Abra a página de um amigo e toque em 🔄 Trocar repetidos.|No hay ofertas. Abre la página de un amigo y toca 🔄 Intercambiar repetidos.
+You give|Dá|Das
+You get|Recebe|Recibes
+Cancel offer|Cancelar proposta|Cancelar oferta
+Offer cancelled|Proposta cancelada|Oferta cancelada
+Trade done! Check your Gallery.|Troca feita! Veja a sua Galeria.|¡Intercambio hecho! Mira tu Galería.
+Trade failed: someone doesn't have those doubles any more.|A troca falhou: alguém já não tem esses repetidos.|El intercambio falló: alguien ya no tiene esos repetidos.
+That offer isn't available any more.|Essa proposta já não está disponível.|Esa oferta ya no está disponible.
+Loading trades…|A carregar trocas…|Cargando intercambios…
+Couldn't load trades. Check your connection.|Não foi possível carregar as trocas. Verifique a ligação.|No se pudieron cargar los intercambios. Revisa tu conexión.
+Couldn't answer the offer. Check your connection.|Não foi possível responder. Verifique a ligação.|No se pudo responder. Revisa tu conexión.
+Couldn't decline. Try again.|Não foi possível recusar. Tente outra vez.|No se pudo rechazar. Inténtalo otra vez.
+Go to Friends to trade →|Ir para Amigos para trocar →|Ir a Amigos para intercambiar →
+You don't have any doubles yet. Duplicates from packs show up in Gallery → My doubles.|Ainda não tem repetidos. Os repetidos dos pacotes aparecem em Galeria → Os meus repetidos.|Todavía no tienes repetidos. Los repetidos de los sobres aparecen en Galería → Mis repetidos.
+Tutorial videos|Vídeos tutoriais|Vídeos tutoriales
+From YouTube|Do YouTube|De YouTube
+Watch on YouTube|Ver no YouTube|Ver en YouTube
+Watch here|Ver aqui|Ver aquí
+Interactive drills|Exercícios interativos|Ejercicios interactivos
+Improve your first touch|Melhore a receção|Mejora tu control
+Dribbling skill moves|Fintas e dribles|Regates y fintas
+Passing and receiving|Passe e receção|Pase y control
+Finishing like a striker|Finalizar como um avançado|Definir como un delantero
+1v1 defending|Defender no 1x1|Defender en el 1x1
+Free kick technique|Técnica de livre|Técnica de tiro libre
+Goalkeeping basics|Básicos de guarda-redes|Básicos de portero
+Heading the ball|Jogo de cabeça|Juego de cabeza
+Fitness for footballers|Forma física para futebolistas|Forma física para futbolistas
+Beginner|Iniciante|Principiante
+Intermediate|Intermédio|Intermedio
+Advanced|Avançado|Avanzado
+Passing triangles|Triângulos de passe|Triángulos de pase
+Dribbling through cones|Drible entre cones|Regate entre conos
+Finishing inside the box|Finalizar dentro da área|Definir dentro del área
+Defending one-on-one|Defender um contra um|Defender uno contra uno
+Keep the ball moving and keep moving after you pass.|Mantenha a bola a circular e mexa-se depois do passe.|Mueve el balón y sigue moviéndote después del pase.
+Close control with both feet.|Controlo curto com os dois pés.|Control corto con los dos pies.
+Pick your spot early and strike with confidence.|Escolha cedo o sítio e remate com confiança.|Elige pronto dónde tirar y dispara con confianza.
+Stay side-on, be patient, force them wide.|Fique de lado, tenha paciência, empurre-o para a linha.|Ponte de lado, ten paciencia, llévalo hacia la banda.
+Set up a triangle about 10 metres apart. Stay on your toes.|Monte um triângulo com cerca de 10 metros entre cones. Fique na ponta dos pés.|Monta un triángulo de unos 10 metros. Mantente sobre las puntas.
+Pass along the ground to B with the inside of your foot.|Passe rasteiro para B com a parte de dentro do pé.|Pasa raso a B con el interior del pie.
+B controls with one touch and opens the body toward C.|B controla com um toque e abre o corpo para C.|B controla con un toque y abre el cuerpo hacia C.
+Pass to C, then move into new space. Never stand still.|Passe para C e procure novo espaço. Nunca fique parado.|Pasa a C y busca otro espacio. Nunca te quedes quieto.
+C plays back to A. Repeat and increase the speed.|C devolve para A. Repita e aumente a velocidade.|C devuelve a A. Repite y aumenta la velocidad.
+Start with the ball glued to your feet. Head up.|Comece com a bola colada aos pés. Cabeça levantada.|Empieza con el balón pegado al pie. Cabeza arriba.
+Small touches. Change direction with the inside of your foot.|Toques curtos. Mude de direção com a parte de dentro do pé.|Toques cortos. Cambia de dirección con el interior del pie.
+Use the outside of your foot to push past cone one.|Use a parte de fora do pé para passar o primeiro cone.|Usa el exterior del pie para pasar el primer cono.
+Accelerate after the last cone. Now try it with your weaker foot.|Acelere depois do último cone. Agora tente com o pé mais fraco.|Acelera tras el último cono. Ahora prueba con tu pie malo.
+Keep your body low and shoulders relaxed.|Corpo baixo e ombros descontraídos.|Cuerpo bajo y hombros relajados.
+Receive the ball on the edge of the box and look at the goal.|Receba a bola à entrada da área e olhe para a baliza.|Recibe en la frontal del área y mira a la portería.
+Take a touch away from the defender, toward your strong foot.|Toque para longe do defesa, para o seu pé forte.|Toca lejos del defensa, hacia tu pie bueno.
+Plant your standing foot next to the ball, lock your ankle.|Pé de apoio ao lado da bola, tornozelo firme.|Pie de apoyo junto al balón, tobillo firme.
+Strike low to the far corner. Follow through toward the target.|Remate rasteiro ao segundo poste. Acompanhe o remate até ao alvo.|Dispara raso al palo largo. Acompaña el golpeo hacia el objetivo.
+Approach quickly, then slow down two metres away.|Aproxime-se depressa e abrande a dois metros.|Acércate rápido y frena a dos metros.
+Stay side-on with knees bent. Show the attacker the sideline.|Fique de lado com os joelhos fletidos. Mostre a linha ao atacante.|Ponte de lado con las rodillas flexionadas. Enseña la banda al atacante.
+Jockey backward. Do not dive in. Wait for a heavy touch.|Recue com ele. Não se atire. Espere por um toque mais longo.|Retrocede con él. No te tires. Espera un toque largo.
+When the ball moves away from their foot, step in and win it.|Quando a bola se afastar do pé dele, entre e ganhe-a.|Cuando el balón se aleje de su pie, entra y gánalo.
+Next|Seguinte|Siguiente
+Previous|Anterior|Anterior
+Done|Feito|Hecho
+Play|Jogar|Jugar
+Play again|Jogar outra vez|Jugar otra vez
+Pause|Pausa|Pausa
+Try again|Tentar outra vez|Intentar otra vez
+Refresh|Atualizar|Actualizar
+↻ Refresh|↻ Atualizar|↻ Actualizar
+🕵️ Who Am I?|🕵️ Quem Sou Eu?|🕵️ ¿Quién soy?
+Who Am I?|Quem Sou Eu?|¿Quién soy?
+🏆 Leaderboard|🏆 Ranking|🏆 Clasificación
+Leaderboard|Ranking|Clasificación
+🔮 Predictions|🔮 Previsões|🔮 Pronósticos
+Predictions|Previsões|Pronósticos
+📊 Live quiz|📊 Quiz ao vivo|📊 Quiz en directo
+⚽ Penalty shootout|⚽ Penáltis|⚽ Tanda de penaltis
+🦶 Keepy uppy|🦶 Toques|🦶 Toques
+🧤 Keeper saves|🧤 Defesas do guarda-redes|🧤 Paradas del portero
+🧠 Football quiz|🧠 Quiz de futebol|🧠 Quiz de fútbol
+🃏 Memory match|🃏 Jogo da memória|🃏 Memoria
+🏟️ Guess the stadium|🏟️ Adivinhe o estádio|🏟️ Adivina el estadio
+🏃 Dribble dash|🏃 Corrida de drible|🏃 Carrera de regate
+🐦 Flappy ball|🐦 Bola voadora|🐦 Balón volador
+🎯 Target practice|🎯 Tiro ao alvo|🎯 Tiro al blanco
+🐍 Pitch snake|🐍 Cobra no relvado|🐍 Serpiente en el campo
+🎪 Free kick|🎪 Livre|🎪 Tiro libre
+🔤 Footy word|🔤 Palavra de futebol|🔤 Palabra de fútbol
+Tap when the target is on the goal. 5 shots.|Toque quando o alvo estiver na baliza. 5 remates.|Toca cuando el objetivo esté en la portería. 5 tiros.
+Tap the ball to keep it in the air.|Toque na bola para a manter no ar.|Toca el balón para mantenerlo en el aire.
+Drag or tap to move your keeper. You have 3 lives.|Arraste ou toque para mover o guarda-redes. Tem 3 vidas.|Arrastra o toca para mover al portero. Tienes 3 vidas.
+Find all the pairs in as few moves as you can.|Encontre todos os pares com o menor número de jogadas.|Encuentra todas las parejas en el menor número de jugadas.
+Tap left or right to change lane and dodge defenders.|Toque à esquerda ou à direita para mudar de faixa e fugir aos defesas.|Toca a la izquierda o derecha para cambiar de carril y esquivar defensas.
+Tap to flap your ball between the goalposts.|Toque para fazer a bola voar entre os postes.|Toca para que el balón vuele entre los postes.
+Tap the targets before they shrink. You have 25 seconds.|Toque nos alvos antes que encolham. Tem 25 segundos.|Toca los objetivos antes de que se encojan. Tienes 25 segundos.
+Tap left or right to turn. Collect balls and avoid walls and yourself.|Toque à esquerda ou à direita para virar. Apanhe bolas e evite as paredes e a si mesmo.|Toca a la izquierda o derecha para girar. Recoge balones y evita las paredes y a ti mismo.
+Tap to set your aim, tap again for power. Clear the wall, stay under the bar. 5 kicks.|Toque para apontar e outra vez para a força. Passe a barreira, por baixo da barra. 5 livres.|Toca para apuntar y otra vez para la fuerza. Supera la barrera, por debajo del larguero. 5 tiros.
+Guess the 5-letter football word in 6 tries.|Adivinhe a palavra de 5 letras em 6 tentativas (palavras em inglês).|Adivina la palabra de 5 letras en 6 intentos (palabras en inglés).
+A new mystery player every day. 6 guesses, and every wrong guess unlocks a clue. Fewer clues = more points and coins.|Um jogador mistério novo todos os dias. 6 tentativas, e cada erro desbloqueia uma pista. Menos pistas = mais pontos e moedas.|Un jugador misterioso nuevo cada día. 6 intentos, y cada fallo desbloquea una pista. Menos pistas = más puntos y monedas.
+Pick a name from the list. Only the 100 Gallery players can be the answer.|Escolha um nome da lista. Só os 100 jogadores da Galeria podem ser a resposta.|Elige un nombre de la lista. Solo los 100 jugadores de la Galería pueden ser la respuesta.
+Type a player's name…|Escreva o nome de um jogador…|Escribe el nombre de un jugador…
+Guess|Tentar|Probar
+Loading today's mystery player…|A carregar o jogador mistério de hoje…|Cargando el jugador misterioso de hoy…
+Who Am I? needs the Gallery players. Make sure the Gallery is set up in Supabase.|O Quem Sou Eu? precisa dos jogadores da Galeria. Confirme que a Galeria está configurada no Supabase.|¿Quién soy? necesita los jugadores de la Galería. Comprueba que la Galería está configurada en Supabase.
+You got it!|Acertou!|¡Acertaste!
+Not in word list. Try a real word.|Não está na lista. Tente uma palavra verdadeira (em inglês).|No está en la lista. Prueba una palabra real (en inglés).
+Not enough letters|Faltam letras|Faltan letras
+Enter|Enter|Enter
+Blocked!|Defendido!|¡Parada!
+Over the bar!|Por cima da barra!|¡Por encima del larguero!
+GOAL!|GOLO!|¡GOL!
+Saved!|Defendido!|¡Parada!
+Missed!|Falhou!|¡Fallo!
+Game over|Fim do jogo|Fin del juego
+Game over!|Fim do jogo!|¡Fin del juego!
+New best!|Novo recorde!|¡Nuevo récord!
+Score|Pontuação|Puntuación
+Best|Recorde|Récord
+Moves|Jogadas|Movimientos
+Time|Tempo|Tiempo
+Lives|Vidas|Vidas
+Your best scores|As suas melhores pontuações|Tus mejores puntuaciones
+No scores yet|Ainda sem pontuações|Todavía no hay puntuaciones
+No scores yet. Be the first!|Ainda sem pontuações. Seja o primeiro!|Todavía no hay puntuaciones. ¡Sé el primero!
+Loading the leaderboard…|A carregar o ranking…|Cargando la clasificación…
+Couldn't load the leaderboard. Check your connection.|Não foi possível carregar o ranking. Verifique a ligação.|No se pudo cargar la clasificación. Revisa tu conexión.
+Sign in and play to get on the leaderboard.|Entre e jogue para aparecer no ranking.|Inicia sesión y juega para aparecer en la clasificación.
+You're not on the board yet. Play a game while signed in!|Ainda não está no ranking. Jogue com a sessão iniciada!|Todavía no estás en la clasificación. ¡Juega con la sesión iniciada!
+Play any game to earn points.|Jogue qualquer jogo para ganhar pontos.|Juega a cualquier juego para ganar puntos.
+Fans from everywhere. Your points come from your best score in every game, so play them all. Only scores made while signed in count.|Adeptos de todo o lado. Os seus pontos vêm da melhor pontuação em cada jogo, por isso jogue todos. Só contam pontuações com sessão iniciada.|Aficionados de todas partes. Tus puntos salen de tu mejor puntuación en cada juego, así que juégalos todos. Solo cuentan las puntuaciones con sesión iniciada.
+points|pontos|puntos
+Points|Pontos|Puntos
+Fan|Adepto|Aficionado
+Save predictions|Guardar previsões|Guardar pronósticos
+🔒 Closed at kick-off|🔒 Fechado no início do jogo|🔒 Cerrado al empezar el partido
+Loading your predictions…|A carregar as suas previsões…|Cargando tus pronósticos…
+Type a score for at least one match first.|Escreva primeiro um resultado em pelo menos um jogo.|Escribe primero un resultado en al menos un partido.
+Saved on this device. Sign in to keep your predictions on every device.|Guardado neste dispositivo. Entre para ter as previsões em todos os dispositivos.|Guardado en este dispositivo. Inicia sesión para tener tus pronósticos en todos los dispositivos.
+The predictions table isn't set up in Supabase yet.|A tabela de previsões ainda não está configurada no Supabase.|La tabla de pronósticos todavía no está configurada en Supabase.
+Your vote didn't save. Check your connection.|O seu voto não foi guardado. Verifique a ligação.|Tu voto no se guardó. Revisa tu conexión.
+Voting isn't set up in Supabase yet.|As votações ainda não estão configuradas no Supabase.|Las votaciones todavía no están configuradas en Supabase.
+coins|moedas|monedas
+Open packs →|Abrir pacotes →|Abrir sobres →
+All packs|Todos os pacotes|Todos los sobres
+See my collection|Ver a minha coleção|Ver mi colección
+My collection|A minha coleção|Mi colección
+My doubles|Os meus repetidos|Mis repetidos
+Packs|Pacotes|Sobres
+Open pack|Abrir pacote|Abrir sobre
+Earn 🪙 coins by playing any game in the Arcade, with no daily limit. Duplicates give some coins back.|Ganhe 🪙 moedas a jogar qualquer jogo da Arcada, sem limite diário. Os repetidos devolvem algumas moedas.|Gana 🪙 monedas jugando a cualquier juego del Arcade, sin límite diario. Los repetidos devuelven algunas monedas.
+Nothing here yet. Open a pack!|Ainda nada aqui. Abra um pacote!|Nada aquí todavía. ¡Abre un sobre!
+No players collected yet.|Ainda não colecionou jogadores.|Todavía no has coleccionado jugadores.
+No doubles yet. When you get a player you already have from a pack, it shows up here.|Ainda sem repetidos. Quando sair num pacote um jogador que já tem, aparece aqui.|Todavía no tienes repetidos. Cuando te salga en un sobre un jugador que ya tienes, aparecerá aquí.
+Loading your Gallery…|A carregar a sua Galeria…|Cargando tu Galería…
+Loading your players…|A carregar os seus jogadores…|Cargando tus jugadores…
+Couldn't load your Gallery. Check your connection.|Não foi possível carregar a Galeria. Verifique a ligação.|No se pudo cargar la Galería. Revisa tu conexión.
+Couldn't open the pack. Check your connection and try again.|Não foi possível abrir o pacote. Verifique a ligação e tente outra vez.|No se pudo abrir el sobre. Revisa tu conexión e inténtalo otra vez.
+Not enough coins. Play games in the Arcade to earn more.|Moedas insuficientes. Jogue na Arcada para ganhar mais.|No tienes suficientes monedas. Juega en el Arcade para ganar más.
+The Gallery isn't set up in Supabase yet.|A Galeria ainda não está configurada no Supabase.|La Galería todavía no está configurada en Supabase.
+The Gallery needs your Supabase connection.|A Galeria precisa da ligação ao Supabase.|La Galería necesita la conexión con Supabase.
+NEW!|NOVO!|¡NUEVO!
+Common|Comum|Común
+Rare|Raro|Raro
+Super rare|Super raro|Súper raro
+Epic|Épico|Épico
+Legendary|Lendário|Legendario
+My account|A minha conta|Mi cuenta
+Account|Conta|Cuenta
+Your stats|As suas estatísticas|Tus estadísticas
+Best penalty score:|Melhor pontuação nos penáltis:|Mejor puntuación en penaltis:
+Best keepy-uppy:|Melhor nos toques:|Mejor en toques:
+Your teams: not picked yet|As suas equipas: ainda não escolhidas|Tus equipos: todavía sin elegir
+Pick my teams|Escolher as minhas equipas|Elegir mis equipos
+Pick your teams|Escolha as suas equipas|Elige tus equipos
+Save my teams|Guardar as minhas equipas|Guardar mis equipos
+Make it yours|Personalize|Hazlo tuyo
+1. Your clubs|1. Os seus clubes|1. Tus clubes
+2. Your country|2. O seu país|2. Tu país
+3. Your leagues|3. As suas ligas|3. Tus ligas
+pick as many as you like|escolha quantos quiser|elige todos los que quieras
+pick one|escolha um|elige uno
+. You can change it any time in Settings.|. Pode mudar quando quiser nas Definições.|. Puedes cambiarlo cuando quieras en Ajustes.
+Pick at least one club, country or league.|Escolha pelo menos um clube, país ou liga.|Elige al menos un club, país o liga.
+Sign in first, then pick your clubs, country and leagues.|Entre primeiro e depois escolha os seus clubes, país e ligas.|Inicia sesión primero y luego elige tus clubes, país y ligas.
+Sign in|Entrar|Iniciar sesión
+Sign out|Terminar sessão|Cerrar sesión
+✏️ Edit|✏️ Editar|✏️ Editar
+Edit|Editar|Editar
+Save|Guardar|Guardar
+Saving…|A guardar…|Guardando…
+Couldn't save. Check your connection and try again.|Não foi possível guardar. Verifique a ligação e tente outra vez.|No se pudo guardar. Revisa tu conexión e inténtalo otra vez.
+Delete account and its data?|Apagar a conta e os dados?|¿Eliminar la cuenta y sus datos?
+Share my activity with friends|Partilhar a minha atividade com amigos|Compartir mi actividad con amigos
+Accounts need a secure (https) page.|As contas precisam de uma página segura (https).|Las cuentas necesitan una página segura (https).
+Something went wrong. Check your connection and try again.|Algo correu mal. Verifique a ligação e tente outra vez.|Algo salió mal. Revisa tu conexión e inténtalo otra vez.
+Check your connection and try again.|Verifique a ligação e tente outra vez.|Revisa tu conexión e inténtalo otra vez.
+Couldn't do that. Try again.|Não foi possível. Tente outra vez.|No se pudo hacer. Inténtalo otra vez.
+Couldn't share. Check your connection.|Não foi possível partilhar. Verifique a ligação.|No se pudo compartir. Revisa tu conexión.
+You're not authorised to do that.|Não tem autorização para isso.|No tienes permiso para hacer eso.
+Loading…|A carregar…|Cargando…
+Nothing yet.|Ainda nada.|Nada todavía.
+Search|Pesquisar|Buscar
+Remove|Remover|Quitar
+Yes, remove|Sim, remover|Sí, quitar
+Yes, do it|Sim, fazer|Sí, hazlo
+Close|Fechar|Cerrar
+Copy link|Copiar link|Copiar enlace
+Link copied|Link copiado|Enlace copiado
+Share|Partilhar|Compartir
+The Footballer · v1.0|The Footballer · v1.0|The Footballer · v1.0
+🛠️ This section is switched off right now|🛠️ Esta secção está desligada agora|🛠️ Esta sección está desactivada ahora
+The admins have paused it for a while. Check back soon!|Os admins pausaram-na por agora. Volte em breve!|Los administradores la han pausado por ahora. ¡Vuelve pronto!
+This area is only for The Footballer administrators.|Esta área é só para os administradores do The Footballer.|Esta zona es solo para los administradores de The Footballer.
+Scores and tables from football-data.org. News from BBC Sport, The Guardian, Sky Sports, ESPN and Google News. The Footballer is not affiliated with any club, league or media outlet.|Resultados e tabelas do football-data.org. Notícias da BBC Sport, The Guardian, Sky Sports, ESPN e Google News. O The Footballer não tem ligação a clubes, ligas ou meios de comunicação.|Resultados y clasificaciones de football-data.org. Noticias de BBC Sport, The Guardian, Sky Sports, ESPN y Google News. The Footballer no está vinculado a ningún club, liga ni medio.
+How many players does each team have on the pitch?|Quantos jogadores tem cada equipa em campo?|¿Cuántos jugadores tiene cada equipo en el campo?
+How long is a standard match without extra time?|Quanto dura um jogo normal sem prolongamento?|¿Cuánto dura un partido normal sin prórroga?
+How far is the penalty spot from the goal line?|A que distância está a marca de penálti da linha de golo?|¿A qué distancia está el punto de penalti de la línea de gol?
+What does a yellow card mean?|O que significa um cartão amarelo?|¿Qué significa una tarjeta amarilla?
+Which club plays at Anfield?|Que clube joga em Anfield?|¿Qué club juega en Anfield?
+Which club plays at the Allianz Arena?|Que clube joga na Allianz Arena?|¿Qué club juega en el Allianz Arena?
+Which club plays at the Santiago Bernabéu?|Que clube joga no Santiago Bernabéu?|¿Qué club juega en el Santiago Bernabéu?
+Which club shares San Siro with Inter?|Que clube partilha o San Siro com o Inter?|¿Qué club comparte San Siro con el Inter?
+Which competition is Europe's top club tournament?|Qual é a principal competição de clubes da Europa?|¿Cuál es la principal competición de clubes de Europa?
+Which country has won the most men's World Cups?|Que país ganhou mais Mundiais masculinos?|¿Qué país ha ganado más Mundiales masculinos?
+Which country hosted and won the first World Cup in 1930?|Que país organizou e ganhou o primeiro Mundial, em 1930?|¿Qué país organizó y ganó el primer Mundial, en 1930?
+Which restart is taken after the ball crosses the sideline?|Como se recomeça o jogo quando a bola sai pela linha lateral?|¿Cómo se reanuda el juego cuando el balón sale por la banda?
+Who is the only player allowed to use hands in open play?|Qual é o único jogador que pode usar as mãos em jogo corrido?|¿Quién es el único jugador que puede usar las manos en juego?
+Three goals by one player in a game is called a...|Três golos de um jogador num jogo chama-se...|Tres goles de un jugador en un partido se llama...
+Old Trafford is the home of which club?|Old Trafford é a casa de que clube?|¿De qué club es el estadio Old Trafford?
+Estádio da Luz is the home of which club?|O Estádio da Luz é a casa de que clube?|¿De qué club es el Estádio da Luz?
+Estádio do Dragão is the home of which club?|O Estádio do Dragão é a casa de que clube?|¿De qué club es el Estádio do Dragão?
+Estádio José Alvalade is the home of which club?|O Estádio José Alvalade é a casa de que clube?|¿De qué club es el Estádio José Alvalade?
+Estádio D. Afonso Henriques is in which city?|Em que cidade fica o Estádio D. Afonso Henriques?|¿En qué ciudad está el Estádio D. Afonso Henriques?
+Estádio Municipal de Braga was built into a former...|O Estádio Municipal de Braga foi construído numa antiga...|El Estádio Municipal de Braga se construyó en una antigua...
+Correct!|Certo!|¡Correcto!
+Wrong!|Errado!|¡Incorrecto!
+Admin|Admin|Admin
+🛡️ Admin|🛡️ Admin|🛡️ Admin
+Reason|Motivo|Motivo
+Reason / warning message (needed for every action)|Motivo / mensagem de aviso (necessário em todas as ações)|Motivo / mensaje de aviso (necesario en todas las acciones)
+Search by name or email|Pesquisar por nome ou email|Buscar por nombre o correo
+No users found.|Nenhum utilizador encontrado.|No se encontraron usuarios.
+No reports here. 🎉|Sem denúncias aqui. 🎉|No hay denuncias aquí. 🎉
+No actions yet.|Ainda sem ações.|Todavía no hay acciones.
+Recent moderation|Moderação recente|Moderación reciente
+Administrators|Administradores|Administradores
+Warning sent|Aviso enviado|Aviso enviado
+⚠️ Send warning|⚠️ Enviar aviso|⚠️ Enviar aviso
+✅ Resolve|✅ Resolver|✅ Resolver
+Site settings saved|Definições do site guardadas|Ajustes del sitio guardados
+Safety settings saved|Definições de segurança guardadas|Ajustes de seguridad guardados
+Word filters|Filtros de palavras|Filtros de palabras
+Spam limits|Limites de spam|Límites de spam
+Sections|Secções|Secciones
+📣 Announcement banner|📣 Faixa de anúncio|📣 Banner de anuncio
+🙈 Hidden news stories|🙈 Notícias escondidas|🙈 Noticias ocultas
+👤 Manage|👤 Gerir|👤 Gestionar
+History|Histórico|Historial
+Overview|Resumo|Resumen
+Reports|Denúncias|Denuncias
+Users|Utilizadores|Usuarios
+Safety|Segurança|Seguridad
+Site|Site|Sitio
+Audit log|Registo|Registro
+Admins|Admins|Admins`;
+TRX.split("\n").forEach(l=>{const p=l.split("|");if(p.length===3)DICT[p[0]]=[p[1],p[2]]});
+// Phrases with numbers or times in them
+const WD_={Mon:["Seg","Lun"],Tue:["Ter","Mar"],Wed:["Qua","Mié"],Thu:["Qui","Jue"],Fri:["Sex","Vie"],Sat:["Sáb","Sáb"],Sun:["Dom","Dom"]},MO_={Jan:["jan","ene"],Feb:["fev","feb"],Mar:["mar","mar"],Apr:["abr","abr"],May:["mai","may"],Jun:["jun","jun"],Jul:["jul","jul"],Aug:["ago","ago"],Sep:["set","sep"],Oct:["out","oct"],Nov:["nov","nov"],Dec:["dez","dic"]};
+const LI=()=>ST.lang==="pt"?0:1,pk2=(p,e)=>[p,e][LI()];
+const AGO=(n,u)=>{const U={min:["min","min"],h:["h","h"],d:["d","d"]}[u][LI()];return pk2(`há ${n} ${U}`,`hace ${n} ${U}`)};
+const PATS=[
+ [/^(.*) · (\d+) (min|h|d) ago$/,(m,a,n,u)=>a+" · "+AGO(n,u)],
+ [/^(\d+) (min|h|d) ago$/,(m,n,u)=>AGO(n,u)],
+ [/^just now$/,()=>pk2("agora mesmo","ahora mismo")],
+ [/^(\d+) games?$/,(m,n)=>n+" "+pk2(n==1?"jogo":"jogos",n==1?"partido":"partidos")],
+ [/^(\d+) votes?$/,(m,n)=>n+" "+pk2(n==1?"voto":"votos",n==1?"voto":"votos")],
+ [/^(.*) · (\d+) pts$/,(m,a,n)=>a+" · "+n+" pts"],
+ [/^Member since (.+)$/,(m,d)=>pk2("Membro desde ","Miembro desde ")+d],
+ [/^Updated (\d\d:\d\d) · refreshes every 5 min$/,(m,t)=>pk2(`Atualizado às ${t} · atualiza a cada 5 min`,`Actualizado a las ${t} · se actualiza cada 5 min`)],
+ [/^Live · updated (\d\d:\d\d) · refreshes every 5 minutes$/,(m,t)=>pk2(`Ao vivo · atualizado às ${t} · atualiza a cada 5 minutos`,`En directo · actualizado a las ${t} · se actualiza cada 5 minutos`)],
+ [/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) (\d+) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$/,(m,w,d,mo)=>WD_[w][LI()]+" "+d+" "+MO_[mo][LI()]],
+ [/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) (\d\d:\d\d)$/,(m,w,t)=>WD_[w][LI()]+" "+t],
+ [/^👥 My friends \((\d+)\)$/,(m,n)=>pk2("👥 Os meus amigos (","👥 Mis amigos (")+n+")"],
+ [/^(.+): (On|Off)$/,(m,a,b)=>(trCore(a)??a)+": "+(trCore(b)??b)],
+ [/^(\d+ votes?|Who will win\? Be the first to vote)(?: · you voted (.+?))?( · voting closed)?$/,(m,a,v,c)=>(trCore(a)??a)+(v?pk2(" · votou "," · votaste ")+(v==="draw"?"empate":v):"")+(c?pk2(" · votação fechada"," · votación cerrada"):"")],
+ [/^\+(\d+) 🪙 coins$/,(m,n)=>`+${n} 🪙 `+pk2("moedas","monedas")],
+];
+function trCore(t){const d=DICT[t];if(d)return d[LI()]||t;for(const[re,f]of PATS){const m=t.match(re);if(m)return f(...m)}return null}
+// Translate one piece of text: whole thing first, then without a leading emoji/arrow or a trailing colon/arrow
+function trText(raw){const t=raw.trim();if(!t||ST.lang==="en")return raw;let v=trCore(t);
+if(v==null){const m=t.match(/^([^A-Za-zÀ-ÿ¿¡]+)(.+?)([\s:→]*)$/u)||t.match(/^()(.+?)([\s:→]+)$/);if(m){const c=trCore(m[2]);if(c!=null)v=m[1]+c+m[3]}}
+if(v==null)return raw;return raw.replace(t,v)}
+// Swap text on screen. The English original of every piece is remembered, so switching back to English restores it.
+const TR_ORIG=new WeakMap(),TR_DONE=new WeakMap(),TR_SKIP=".bub,.article,.abody,.tk,.rec h3,.rec p,.card h3,.card p,.story,.headline,input,textarea,script,style,[contenteditable],[data-notr]";
+function trNode(n){const p=n.parentElement;if(!p||p.closest(TR_SKIP))return;const cur=n.nodeValue;if(TR_DONE.get(n)!==cur)TR_ORIG.set(n,cur);const en=TR_ORIG.get(n),v=trText(en);if(cur!==v){n.nodeValue=v}TR_DONE.set(n,v)}
+function trAttrs(e){for(const a of["placeholder","aria-label","title"]){if(!e.hasAttribute(a))continue;const k="data-en-"+a,cur=e.getAttribute(a);if(e.getAttribute("data-tr-"+a)!==cur)e.setAttribute(k,cur);const v=trText(e.getAttribute(k));if(cur!==v)e.setAttribute(a,v);e.setAttribute("data-tr-"+a,v)}}
+let lgBusy=false,lgQueued=false;
+function translateDom(root){if(lgBusy)return;lgBusy=true;try{root=root||document.body;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode())trNode(n);root.querySelectorAll&&root.querySelectorAll("[placeholder],[aria-label],[title]").forEach(e=>{if(!e.closest(".bub,.article"))trAttrs(e)})}finally{lgBusy=false}}
+// Anything new that appears (toasts, game messages, loaded lists) is translated straight away
+new MutationObserver(()=>{if(lgBusy||lgQueued||ST.lang==="en")return;lgQueued=true;requestAnimationFrame(()=>{lgQueued=false;translateDom()})}).observe(document.documentElement,{childList:true,subtree:true,characterData:true});
 function applyST(){const R=document.documentElement,p=PRE[ST.accent]||PRE[0];R.style.setProperty("--turf",p[1]);R.style.setProperty("--card-y",p[1]);R.style.setProperty("--acc2",p[2]);R.style.setProperty("--glow",p[2]+"66");
 const dark=ST.mode==="auto"?matchMedia("(prefers-color-scheme: dark)").matches:ST.mode==="dark";R.dataset.theme=dark?"dark":"light";document.body.style.fontSize=16*ST.size/100+"px";R.classList.toggle("nomo",!ST.motion);R.classList.toggle("noticker",!ST.ticker);R.lang=ST.lang;}
 try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{if(ST.mode==="auto")applyST()})}catch(e){}
-ST.lang="en";// the language option was removed; everything is in English
+
 applyST();tab=ST.start||tab;
 const tg=(k,l)=>`<button class="chip" data-tog="${k}" aria-pressed="${ST[k]}">${l}: ${ST[k]?L("On"):L("Off")}</button>`;
 function settingsPage(){return `<h2 style="font-size:40px;margin-bottom:14px">${L("Settings")}</h2><div class="two">`
 +`<div class="panel" style="padding:16px"><h3>${L("Appearance")}</h3><p class="sl">${L("Accent colour")}</p><div class="sw">${PRE.map((x,i)=>`<button class="swb" data-acc="${i}" aria-pressed="${ST.accent===i}" aria-label="${x[0]}" style="background:${x[1]}"></button>`).join("")}</div><p class="sl">${L("Mode")}</p><div class="chips">${[["dark","Dark"],["light","Light"],["auto","Auto"]].map(m=>`<button class="chip" data-tm="${m[0]}" aria-pressed="${ST.mode===m[0]}">${L(m[1])}</button>`).join("")}</div><p class="sl">${L("Text size")}</p><div class="chips">${[90,100,115,130].map(z=>`<button class="chip" data-sz="${z}" aria-pressed="${ST.size===z}">${z}%</button>`).join("")}</div></div>`
-+`<div class="panel" style="padding:16px"><h3>${L("Preferences")}</h3><div class="chips">${tg("ticker",L("News ticker"))}${tg("motion",L("Animations"))}${tg("share","Share my activity with friends")}</div><p class="sl">${L("Start page")}</p><div class="chips">${[["news","News"],["matches","Matches"],["arcade","Arcade"],["chat","Chat"]].map(x=>`<button class="chip" data-st="${x[0]}" aria-pressed="${ST.start===x[0]}">${L(x[1])}</button>`).join("")}</div></div>`
++`<div class="panel" style="padding:16px"><h3>${L("Language")}</h3><div class="chips">${LANGS.map(l=>`<button class="chip" data-lang="${l[0]}" aria-pressed="${ST.lang===l[0]}" data-notr>${l[1]}</button>`).join("")}</div><p class="sl">${L("The site's own words change language. News stories, chat messages and player names stay as they are.")}</p><h3 style="margin-top:14px">${L("Preferences")}</h3><div class="chips">${tg("ticker",L("News ticker"))}${tg("motion",L("Animations"))}${tg("share",L("Share my activity with friends"))}</div><p class="sl">${L("Start page")}</p><div class="chips">${[["news","News"],["matches","Matches"],["arcade","Arcade"],["chat","Chat"]].map(x=>`<button class="chip" data-st="${x[0]}" aria-pressed="${ST.start===x[0]}">${L(x[1])}</button>`).join("")}</div></div>`
 +`<div class="panel" style="padding:16px"><h3>${L("Account")}</h3>${me?`<p>${esc(me.name)}<br><span style="color:var(--mute)">${esc(me.email)}</span></p><p class="sl">Your teams: ${PREF()?esc([...PREF().clubs,PREF().country,...PREF().leagues.map(LGN)].filter(Boolean).join(", "))||"none picked":"not picked yet"}</p><div class="chips"><button class="chip" data-t="setup">${PREF()?"Change my teams":"Pick my teams"}</button></div><div class="chips"><button class="btn" data-out>${L("Sign out")}</button>${delAsk?`<button class="btn" data-del="yes">${L("Yes, delete")}</button><button class="btn ghost" data-del="no">${L("Cancel")}</button>`:`<button class="btn ghost" data-del="ask">${L("Delete account")}</button>`}</div>`:`<p style="color:var(--mute)">${L("You are not signed in.")}</p><button class="btn" data-t="account">${L("Sign in")}</button>`}</div>`
 +`<div class="panel" style="padding:16px"><h3>${L("Data")}</h3><div class="chips"><button class="chip" data-clr="saved">${L("Clear saved stories")}</button><button class="chip" data-clr="scores">${L("Clear arcade scores")}</button><button class="chip" data-clr="reset">${L("Reset settings")}</button></div><h3 style="margin-top:14px">${L("About")}</h3><p class="sl">The Footballer · v1.0<br>${L("Not affiliated with any club, league or media outlet.")}</p></div></div>`}
 
@@ -962,7 +1446,7 @@ else if(d.ackw){SB.rpc("ack_warning",{p_id:+d.ackw}).then(()=>{},()=>{});WARN.sh
 else if(d.as){asub=d.as;ACONF=null;aMsg="";AD[asub]=undefined}else if(d.aref!==undefined){AD[asub]=undefined;aMsg=""}else if(d.arf){repFilter=d.arf;AD.reports=undefined}else if(d.aroom){aRoom=d.aroom;AD.chat=undefined}
 else if(d.actx){const id=+d.actx;if(ACTX[id])delete ACTX[id];else{arpc("admin_message_context",{p_message_id:id}).then(x=>{ACTX[id]=x||[];render()},e=>{aMsg="⚠️ "+e.message;render()});return}}
 else if(d.aask!==undefined){ACONF=d.aask||null}else if(d.ado){aDo(d.ado);return}else if(d.auser!==undefined){asub="users";aQ=d.auser;AD.users=undefined;ACONF=null}else if(d.asearch!==undefined){aQ=(($("#aq-users")||{}).value||"").trim();AD.users=undefined}else if(d.addback){addBack(d.addback);return}else if(d.decline){decline(d.decline);return}else if(d.unfask!==undefined){unfAsk=d.unfask||null}else if(d.unfriend){unfriend(d.unfriend);return}else if(d.frefresh!==undefined){loadFriends();return}else if(d.back!==undefined){open=null;tab=openFrom||"news";openFrom=null}
-else if(d.mode){authMode=d.mode}else if(d.sub!==undefined){doAuth();return}else if(d.out!==undefined){stopInbox();me=null;saved=[];tab=ST.start||"news";wantTab=null;if(SB)SB.auth.signOut();try{localStorage.removeItem("rf_session")}catch(x){}}else if(d.del){if(d.del==="ask")delAsk=true;else if(d.del==="no")delAsk=false;else if(SB){delAsk=false;SB.rpc("delete_me").then(({error})=>{if(!error){me=null;saved=[];SB.auth.signOut({scope:"local"})}render()});return}else{const u=US();delete u[me.email];wU(u);me=null;saved=[];delAsk=false;try{localStorage.removeItem("rf_session")}catch(x){}}}else if(d.acc!==undefined){ST.accent=+d.acc;applyST();saveST()}else if(d.tm){ST.mode=d.tm;applyST();saveST()}else if(d.sz){ST.size=+d.sz;applyST();saveST()}else if(d.lang){ST.lang=d.lang;applyST();saveST()}else if(d.tog){ST[d.tog]=!ST[d.tog];applyST();saveST()}else if(d.st){ST.start=d.st;saveST()}
+else if(d.mode){authMode=d.mode}else if(d.sub!==undefined){doAuth();return}else if(d.out!==undefined){stopInbox();me=null;saved=[];tab=ST.start||"news";wantTab=null;if(SB)SB.auth.signOut();try{localStorage.removeItem("rf_session")}catch(x){}}else if(d.del){if(d.del==="ask")delAsk=true;else if(d.del==="no")delAsk=false;else if(SB){delAsk=false;SB.rpc("delete_me").then(({error})=>{if(!error){me=null;saved=[];SB.auth.signOut({scope:"local"})}render()});return}else{const u=US();delete u[me.email];wU(u);me=null;saved=[];delAsk=false;try{localStorage.removeItem("rf_session")}catch(x){}}}else if(d.acc!==undefined){ST.accent=+d.acc;applyST();saveST()}else if(d.tm){ST.mode=d.tm;applyST();saveST()}else if(d.sz){ST.size=+d.sz;applyST();saveST()}else if(d.lang){ST.lang=d.lang;applyST();saveST();render();translateDom();return}else if(d.tog){ST[d.tog]=!ST[d.tog];applyST();saveST()}else if(d.st){ST.start=d.st;saveST()}
 else if(d.clr){if(d.clr==="saved"){saved=[];persist()}else if(d.clr==="scores"){["pen","keep","keeper","quiz","stad","mem","dash","flap","tgt","snake","fk","word"].forEach(k=>{try{localStorage.removeItem("rf_hs_"+k)}catch(x){}})}else{ST={...DEF};applyST();saveST()}}
 else if(d.sv){toggleSave(d.sv)}
 else if(d.dguess!==undefined){dGuess();return}else if(d.dshare!==undefined){dShare();return}else if(d.day!==undefined){mday=+d.day}else if(d.share){shareFor=shareFor===d.share?null:d.share}else if(d.shareto){shareNews(shareFor,d.shareto);return}else if(d.openurl){const n=ANY().find(x=>x.url===d.openurl)||savedList().find(x=>x.url===d.openurl);if(n){openFrom=tab;open=n.id;tab="news";setTimeout(()=>scrollTo(0,0),0)}else{window.open(d.openurl,"_blank","noopener");return}}else if(d.gochat){tab="chat";room=d.gochat}else if(d.gs){gsub=d.gs;if(d.gs!=="open")PULL=null}else if(d.gf){gfil=d.gf}else if(d.pack){openPack(d.pack);return}else if(d.vote){const[i,k]=d.vote.split("|");castVote(i,k);return}else if(d.nm){newsMode=d.nm;cat="All"}else if(d.mm){matchMode=d.mm;lgSet=false}
