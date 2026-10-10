@@ -121,6 +121,7 @@ nav button[aria-selected=true]{box-shadow:0 0 18px color-mix(in srgb,var(--turf)
 .tourcard{display:flex;flex-direction:column;gap:12px}.tround{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.tround b{font-size:22px}.tround span{color:var(--mute);font-weight:700}
 .tvs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;text-align:center;gap:10px}.tvs small{display:block;font-weight:700;color:var(--mute);overflow-wrap:anywhere}.tp{font-size:44px;font-weight:800;line-height:1.1}.tv{color:var(--mute)}.tlead{text-align:center;margin:0;font-weight:700}.tbye,.tout{margin:0;font-weight:700}
 .tourrow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--line)}.tourrow:last-child{border:0}.tourrow span{color:var(--mute)}.tourrow small{color:var(--mute)}.tourrow.me b{color:#f5c542}
+.own{display:block;margin-top:5px;font-size:11px;font-weight:800;color:var(--mute);text-align:center}.own.new{color:#fff;background:#1f9d55;border-radius:99px;padding:2px 8px}
 .kb{display:flex;flex-direction:column;gap:6px;margin-top:8px}.kbr{display:flex;gap:4px;justify-content:center}.kk{flex:1;max-width:40px;height:46px;padding:0;border-radius:8px;border:1.5px solid var(--line);background:#ffffff14;color:inherit;font-weight:800;font-size:15px}.kk.wide{max-width:64px;flex:1.6;font-size:12px}
 .kk.g{background:#1f9d55;border-color:#1f9d55;color:#fff}.kk.y{background:#c9a227;border-color:#c9a227;color:#fff}.kk.x{background:#3a4258;border-color:#3a4258;color:#ffffff88}
 .wmsg{min-height:20px;margin:4px 0 0;text-align:center;font-weight:700;color:#ff8a8c}.shake{animation:shake .4s}@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
@@ -1224,6 +1225,10 @@ Coins|Moedas|Monedas
 Players collected|Jogadores colecionados|Jugadores coleccionados
 Tournament wins|Torneios ganhos|Torneos ganados
 Predictions made|Previsões feitas|Pronósticos hechos
+You have|Tem|Tienes
+New for you|Novo para si|Nuevo para ti
+Pick 1 to 5 doubles on each side. The numbers don't have to match. You both keep at least one of every player.|Escolha 1 a 5 repetidos de cada lado. Os números não têm de ser iguais. Ambos ficam com pelo menos um de cada jogador.|Elige de 1 a 5 repetidos en cada lado. No tienen que ser los mismos. Los dos os quedáis con al menos uno de cada jugador.
+Pick at least one on each side|Escolha pelo menos um de cada lado|Elige al menos uno en cada lado
 Admins|Admins|Admins`;
 TRX.split("\n").forEach(l=>{const p=l.split("|");if(p.length===3)DICT[p[0]]=[p[1],p[2]]});
 // Phrases with numbers or times in them
@@ -1389,13 +1394,15 @@ updateFriendsDot();if(tab==="friends"&&fsub==="trades")render()}
 const cardChips=ids=>(ids||[]).map(i=>{const p=GP.find(x=>x.id===i);return p?`<span class="tcard" style="--rc:${rarOf(p.rarity)[3]}">${rarOf(p.rarity)[2]} ${esc(p.name)}</span>`:"<span class=\"tcard\">?</span>"}).join(" ");
 function tradeBuilder(){const id=trSel&&trSel.to;if(!id)return"";const P=FD.prof[id],nm=esc(fname(id));
 if(!P){loadFriend(id);return'<p class="sl">Loading…</p>'}if(!gTried){loadGallery().then(()=>{if(tab==="friends")render()});return'<p class="sl">Loading your players…</p>'}
-const fc=pid=>(P.g.find(c=>c.player_id===pid)||{}).copies||0,myD=GP.filter(p=>(COL[p.id]||0)>=2),hisD=GP.filter(p=>fc(p.id)>=2),g=trSel.give,w=trSel.get,ok=g.length>0&&g.length===w.length;
-const pick=(p,sel,attr,n)=>`<button class="pick${sel?" sel":""}" ${attr}="${p.id}" aria-pressed="${sel}" aria-label="${esc(p.name)}, ${n} copies">${pcard(p,n)}</button>`;
+const fc=pid=>(P.g.find(c=>c.player_id===pid)||{}).copies||0,myD=GP.filter(p=>(COL[p.id]||0)>=2),hisD=GP.filter(p=>fc(p.id)>=2),g=trSel.give,w=trSel.get,ok=g.length>0&&w.length>0;
+const pick=(p,sel,attr,n,own)=>`<button class="pick${sel?" sel":""}" ${attr}="${p.id}" aria-pressed="${sel}" aria-label="${esc(p.name)}, ${n} copies${own==null?"":own?", you have "+own:", new for you"}">${pcard(p,n)}${own==null?"":own?`<span class="own">✓ ${L("You have")} <b>${own}</b></span>`:`<span class="own new">\u{1F195} ${L("New for you")}</span>`}</button>`;
+// friend's doubles: players you don't have yet come first
+hisD.sort((a,b)=>((COL[a.id]||0)>0)-((COL[b.id]||0)>0));
 return `<div class="row" style="justify-content:flex-start;margin:0 0 12px"><button class="back" data-fview="${esc(id)}">← Back to ${nm}</button></div>
-<div class="panel"><h3>🔄 Trade doubles with ${nm}</h3><p class="sl" style="margin-top:2px">Pick the same number of doubles on each side (1 to 5). You both keep at least one of every player.</p>
+<div class="panel"><h3>🔄 Trade doubles with ${nm}</h3><p class="sl" style="margin-top:2px">Pick 1 to 5 doubles on each side. The numbers don't have to match. You both keep at least one of every player.</p>
 <h3 style="margin-top:14px">You give <small class="hint">${g.length}/5 picked</small></h3>${myD.length?`<div class="pgrid">${myD.map(p=>pick(p,g.includes(p.id),"data-tg",COL[p.id])).join("")}</div>`:'<p class="sl">You don\'t have any doubles yet. Duplicates from packs show up in Gallery → My doubles.</p>'}
-<h3 style="margin-top:18px">You get <small class="hint">${w.length}/5 picked</small></h3>${hisD.length?`<div class="pgrid">${hisD.map(p=>pick(p,w.includes(p.id),"data-tw",fc(p.id))).join("")}</div>`:`<p class="sl">${nm} doesn't have any doubles right now.</p>`}
-<div class="tsum">${g.length||w.length?`<p>You give ${cardChips(g)||"—"}</p><p>You get ${cardChips(w)||"—"}</p>`:""}<button class="btn" data-tsend ${ok&&!trBusy?"":"disabled"}>${trBusy?"Sending…":ok?`Send offer (${g.length} for ${w.length})`:"Pick the same number on each side"}</button><p class="sl" role="status">${trMsg}</p></div></div>`}
+<h3 style="margin-top:18px">You get <small class="hint">${w.length}/5 picked</small></h3>${hisD.length?`<div class="pgrid">${hisD.map(p=>pick(p,w.includes(p.id),"data-tw",fc(p.id),COL[p.id]||0)).join("")}</div>`:`<p class="sl">${nm} doesn't have any doubles right now.</p>`}
+<div class="tsum">${g.length||w.length?`<p>You give ${cardChips(g)||"—"}</p><p>You get ${cardChips(w)||"—"}</p>`:""}<button class="btn" data-tsend ${ok&&!trBusy?"":"disabled"}>${trBusy?"Sending…":ok?`Send offer (${g.length} for ${w.length})`:"Pick at least one on each side"}</button><p class="sl" role="status">${trMsg}</p></div></div>`}
 async function sendTrade(){if(!trSel||trBusy)return;trBusy=true;trMsg="";render();const{error}=await SB.rpc("propose_trade",{p_to:trSel.to,p_give:trSel.give,p_get:trSel.get});trBusy=false;
 if(error){trMsg=/does not exist|schema cache/i.test(error.message)?"Trading isn't set up in Supabase yet.":error.message.replace(/^.*?:\s*/,"");return render()}
 toast("Offer sent to "+fname(trSel.to));trSel=null;fsub="trades";TRL=false;render()}
