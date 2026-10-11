@@ -125,6 +125,7 @@ nav button[aria-selected=true]{box-shadow:0 0 18px color-mix(in srgb,var(--turf)
 .rhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.rhead h3{margin:0}.rooms .plus{width:32px;height:32px;min-width:0;padding:0;margin:0;border-radius:50%;border:0;background:var(--turf,#2a6df4);color:#fff;font-size:22px;font-weight:800;line-height:32px;text-align:center;display:block}
 .chead{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line)}.chead b{font-size:18px}.chead small{color:var(--mute);flex:1 1 100%}.chead .leave{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .gname{width:100%;margin:4px 0 2px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:rgba(0,0,0,.2);color:var(--ink);font:inherit}.gpick{display:flex;flex-wrap:wrap;gap:6px}
+.trules{padding:12px 16px}.trules summary{font-weight:800;cursor:pointer}.trules ul{margin:8px 0 0;padding-left:20px}.trules li{margin:4px 0;color:var(--mute)}
 .kb{display:flex;flex-direction:column;gap:6px;margin-top:8px}.kbr{display:flex;gap:4px;justify-content:center}.kk{flex:1;max-width:40px;height:46px;padding:0;border-radius:8px;border:1.5px solid var(--line);background:#ffffff14;color:inherit;font-weight:800;font-size:15px}.kk.wide{max-width:64px;flex:1.6;font-size:12px}
 .kk.g{background:#1f9d55;border-color:#1f9d55;color:#fff}.kk.y{background:#c9a227;border-color:#c9a227;color:#fff}.kk.x{background:#3a4258;border-color:#3a4258;color:#ffffff88}
 .wmsg{min-height:20px;margin:4px 0 0;text-align:center;font-weight:700;color:#ff8a8c}.shake{animation:shake .4s}@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
@@ -856,7 +857,7 @@ const tDate=d=>d?new Date(d+"T12:00:00").toLocaleDateString(ST.lang==="pt"?"pt-P
 const roundName=(r,n)=>r===n?L("Final"):r===n-1?L("Semi-final"):r===n-2?L("Quarter-final"):L("Round")+" "+r;
 // time left until midnight in Portugal, when the round is settled
 const tLeft=()=>{const p=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Lisbon",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date()).split(":");const m=1440-(+p[0]*60+ +p[1]);return Math.floor(m/60)+"h "+(m%60)+"m"};
-function tourPage(){const T=TOUR,top=`<h2 style="font-size:40px;margin-bottom:6px">🏆 ${L("Tournament")}</h2><p class="sl" style="margin-top:0">${L("A knockout with every fan. One round a day: whoever scores the most Arcade points by midnight (Portugal time) goes through. Your points are your best score in each game that day, added up. Draws are decided at random.")}</p>`;
+function tourPage(){const T=TOUR,top=`<h2 style="font-size:40px;margin-bottom:6px">🏆 ${L("Tournament")}</h2><p class="sl" style="margin-top:0">${L("A knockout with every fan, one round a day.")}</p><details class="panel trules" open><summary>📋 ${L("How points work")}</summary><ul><li>${L("Each day is one round. It ends at midnight (Portugal time).")}</li><li>${L("Your points = your best score in each Arcade game today, added up.")}</li><li>${L("Playing the same game again only adds points if you beat your best in it today, so play lots of different games.")}</li><li>${L("Predictions don't count. Who Am I? does.")}</li><li>${L("Most points at midnight goes through. A draw is decided at random.")}</li></ul></details>`;
 if(TOURERR)return top+`<p class="empty">${L(TOURERR)}</p>`;
 if(!T)return top+`<p class="empty">${L("Loading the tournament…")}</p>`;
 let h=top;
@@ -1413,6 +1414,13 @@ Pick a chat:|Escolha uma conversa:|Elige un chat:
 Shared with all your friends|Partilhado com todos os seus amigos|Compartido con todos tus amigos
 Add friends first, then share with them.|Adicione amigos primeiro e depois partilhe com eles.|Añade amigos primero y luego comparte con ellos.
 You can only message your friends.|Só pode enviar mensagens aos seus amigos.|Solo puedes escribir a tus amigos.
+A knockout with every fan, one round a day.|Um torneio a eliminar com todos os adeptos, uma ronda por dia.|Un torneo eliminatorio con todos los aficionados, una ronda al día.
+How points work|Como funcionam os pontos|Cómo funcionan los puntos
+Each day is one round. It ends at midnight (Portugal time).|Cada dia é uma ronda. Acaba à meia-noite (hora de Portugal).|Cada día es una ronda. Termina a medianoche (hora de Portugal).
+Your points = your best score in each Arcade game today, added up.|Os seus pontos = a sua melhor pontuação em cada jogo da Arcada hoje, somadas.|Tus puntos = tu mejor puntuación en cada juego del Arcade hoy, sumadas.
+Playing the same game again only adds points if you beat your best in it today, so play lots of different games.|Jogar o mesmo jogo outra vez só dá pontos se bater o seu recorde de hoje nesse jogo, por isso jogue muitos jogos diferentes.|Jugar al mismo juego otra vez solo suma puntos si superas tu mejor marca de hoy en él, así que juega a muchos juegos distintos.
+Predictions don't count. Who Am I? does.|As Previsões não contam. O Quem Sou Eu? conta.|Los Pronósticos no cuentan. ¿Quién soy? sí.
+Most points at midnight goes through. A draw is decided at random.|Quem tiver mais pontos à meia-noite passa. Um empate é decidido à sorte.|Quien tenga más puntos a medianoche pasa. Un empate se decide al azar.
 Admins|Admins|Admins`;
 TRX.split("\n").forEach(l=>{const p=l.split("|");if(p.length===3)DICT[p[0]]=[p[1],p[2]]});
 // Phrases with numbers or times in them
