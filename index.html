@@ -134,6 +134,50 @@ tr.z1 td:first-child{box-shadow:inset 4px 0 0 #1f9d55}tr.z2 td:first-child{box-s
 .zkey{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin-top:10px}.zkey span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}.zkey .z1::before{background:#1f9d55}.zkey .z2::before{background:#e0a526}.zkey .z3::before{background:#d64545}
 .bracket{display:flex;gap:14px;overflow-x:auto;padding-bottom:4px}.kround{min-width:210px;flex:1}.kround h4{margin:0 0 8px}.ktie{border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:8px}.kteam{display:flex;justify-content:space-between;gap:8px}.kteam.win{font-weight:800;color:#5ad18a}.ktie small{color:var(--mute)}
 .gaway h3{margin-bottom:6px}.gasteps{margin:0;padding-left:22px}.gasteps li{margin:7px 0;line-height:1.45}.gasteps li::marker{font-weight:800;color:var(--turf,#2a6df4)}
+#evfx{position:fixed;inset:0;pointer-events:none;z-index:3;overflow:hidden}.evp{position:absolute;top:-6vh;font-size:var(--s);animation:evfall var(--t) linear var(--dl) infinite;opacity:.85}@keyframes evfall{to{transform:translateY(112vh) rotate(360deg)}}.nomo #evfx{display:none}
+#evfx[data-th=neon] .evp{color:#ff2bd6;text-shadow:0 0 8px #ff2bd6,0 0 16px #00e5ff;animation-name:evrise;top:auto;bottom:-6vh}@keyframes evrise{to{transform:translateY(-112vh)}}#evfx[data-th=neon] .evp:nth-child(2n){color:#00e5ff}
+#evfx[data-th=retro] .evp{color:#3ddc84;animation-timing-function:steps(24)}#evfx[data-th=winter] .evp{color:#fff;text-shadow:0 0 6px #9fd8ff}
+/* GOLD */
+:root[data-ev=gold]{--turf:#f5c542;--line:rgba(245,197,66,.38);--card:rgba(245,197,66,.08);--bg:#120d02;--mute:#d9c48a}
+:root[data-ev=gold] body{background:radial-gradient(1200px 700px at 50% -10%,#6b4f00,transparent 70%),#120d02}
+:root[data-ev=gold] .btn{background:linear-gradient(110deg,#b8860b,#ffe27a 42%,#fff8d6 50%,#ffe27a 58%,#b8860b);background-size:260% 100%;color:#2a1c00;font-weight:800;animation:evshine 3s linear infinite;box-shadow:0 0 14px #f5c54288,inset 0 -2px 0 #8a6400}
+@keyframes evshine{to{background-position:-260% 0}}
+:root[data-ev=gold] .btn.ghost{background:transparent;color:#ffe27a;border:1.5px solid #f5c542;animation:none}
+:root[data-ev=gold] .chip{border-color:#f5c54266;color:#fff3c4}
+:root[data-ev=gold] .chip[aria-pressed=true],:root[data-ev=gold] nav button[aria-selected=true]{background:linear-gradient(135deg,#fff3c4,#f5c542 50%,#c8961a);color:#2a1c00;border-color:#ffe27a;box-shadow:0 0 16px #f5c542aa}
+:root[data-ev=gold] .panel{border:1.5px solid #f5c54277;box-shadow:inset 0 0 0 1px #f5c54222,0 0 24px #f5c54222}
+:root[data-ev=gold] main h1,:root[data-ev=gold] main h2{background:linear-gradient(90deg,#fff3c4,#f5c542,#fff3c4);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:evshine 4s linear infinite}
+:root[data-ev=gold] .bar{border-bottom:2px solid #f5c542;box-shadow:0 4px 24px #f5c54233}:root[data-ev=gold] .tabbar{border-top:2px solid #f5c542;background:#1a1302f0}
+/* NEON */
+:root[data-ev=neon]{--turf:#ff2bd6;--line:rgba(255,43,214,.45);--bg:#05010d;--card:rgba(30,0,50,.55);--mute:#c9a6ff}
+:root[data-ev=neon] body{background:linear-gradient(#ff2bd614 1px,transparent 1px) 0 0/44px 44px,linear-gradient(90deg,#00e5ff14 1px,transparent 1px) 0 0/44px 44px,radial-gradient(900px 500px at 50% 0%,#3b0a52,transparent),#05010d}
+:root[data-ev=neon] .btn{background:#0000;color:#ffb3f2;border:2px solid #ff2bd6;box-shadow:0 0 10px #ff2bd6,inset 0 0 10px #ff2bd699;text-shadow:0 0 6px #ff2bd6}:root[data-ev=neon] .btn:hover{background:#ff2bd6;color:#fff}
+:root[data-ev=neon] .chip{border-color:#00e5ff88;color:#bff8ff;box-shadow:0 0 6px #00e5ff44}
+:root[data-ev=neon] .chip[aria-pressed=true],:root[data-ev=neon] nav button[aria-selected=true]{background:#00e5ff;color:#001018;border-color:#00e5ff;box-shadow:0 0 18px #00e5ff,0 0 40px #00e5ff66}
+:root[data-ev=neon] .panel{border:1.5px solid #ff2bd688;box-shadow:0 0 18px #ff2bd633,inset 0 0 26px #ff2bd615}
+:root[data-ev=neon] main h1,:root[data-ev=neon] main h2{color:#fff;text-shadow:0 0 6px #ff2bd6,0 0 18px #ff2bd6,0 0 34px #7a5cff;animation:evflick 4s infinite}
+@keyframes evflick{0%,90%,100%{opacity:1}91%{opacity:.55}93%{opacity:1}95%{opacity:.7}}
+:root[data-ev=neon] .bar{border-bottom:2px solid #ff2bd6;box-shadow:0 0 22px #ff2bd666}:root[data-ev=neon] .tabbar{border-top:2px solid #00e5ff;box-shadow:0 0 18px #00e5ff66}
+/* RETRO */
+:root[data-ev=retro]{--turf:#3ddc84;--bg:#0d0d0d;--card:#161616;--line:#3ddc84aa;--mute:#9fdcb6}
+:root[data-ev=retro] body{font-family:"Courier New",monospace;background:#0d0d0d}
+:root[data-ev=retro] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:4;background:repeating-linear-gradient(0deg,#0000 0 2px,#00000038 2px 3px)}
+:root[data-ev=retro] main h1,:root[data-ev=retro] main h2,:root[data-ev=retro] main h3,:root[data-ev=retro] .btn,:root[data-ev=retro] .chip,:root[data-ev=retro] nav button{font-family:"Press Start 2P","Courier New",monospace}
+:root[data-ev=retro] main h2{font-size:24px!important;color:#3ddc84;text-shadow:3px 3px 0 #0a5c32;text-transform:uppercase}:root[data-ev=retro] main h3{font-size:13px;color:#7dffb3}
+:root[data-ev=retro] .btn,:root[data-ev=retro] .chip,:root[data-ev=retro] .panel,:root[data-ev=retro] nav button,:root[data-ev=retro] input,:root[data-ev=retro] .pc{border-radius:0!important}
+:root[data-ev=retro] .btn{background:#3ddc84;color:#000;border:2px solid #000;box-shadow:4px 4px 0 #0a5c32;font-size:11px;padding:10px 14px}:root[data-ev=retro] .btn:active{transform:translate(4px,4px);box-shadow:none}:root[data-ev=retro] .btn.ghost{background:#161616;color:#3ddc84;border-color:#3ddc84}
+:root[data-ev=retro] .chip{border:2px solid #3ddc84;box-shadow:3px 3px 0 #0a5c32;font-size:10px;color:#c9ffe0}:root[data-ev=retro] nav button{font-size:9px}
+:root[data-ev=retro] .chip[aria-pressed=true],:root[data-ev=retro] nav button[aria-selected=true]{background:#3ddc84;color:#000;border-color:#000}
+:root[data-ev=retro] .panel{border:3px solid #3ddc84;box-shadow:6px 6px 0 #0a5c32}:root[data-ev=retro] .bar{border-bottom:3px solid #3ddc84}
+/* WINTER */
+:root[data-ev=winter]{--turf:#9fd8ff;--bg:#06121f;--card:rgba(220,240,255,.09);--line:rgba(180,225,255,.38);--mute:#b9d9ef}
+:root[data-ev=winter] body{background:linear-gradient(180deg,#123a5c,#06121f 55%)}
+:root[data-ev=winter] .btn{background:linear-gradient(180deg,#ffffff,#cfeaff);color:#0b2a45;font-weight:800;box-shadow:0 0 14px #9fd8ff88,inset 0 -3px 0 #9fc9e8;border-radius:14px}
+:root[data-ev=winter] .btn.ghost{background:#ffffff14;color:#e8f6ff;border:1.5px solid #cfeaff88}
+:root[data-ev=winter] .chip[aria-pressed=true],:root[data-ev=winter] nav button[aria-selected=true]{background:linear-gradient(180deg,#fff,#cfeaff);color:#0b2a45;border-color:#fff;box-shadow:0 0 14px #9fd8ffaa}
+:root[data-ev=winter] .panel{backdrop-filter:blur(10px);border:1.5px solid #cfeaff55;border-top:3px solid #ffffffcc;box-shadow:inset 0 1px 0 #ffffff40,0 10px 30px #0006}
+:root[data-ev=winter] main h1,:root[data-ev=winter] main h2{color:#f2fbff;text-shadow:0 0 14px #9fd8ff,0 0 2px #fff}
+:root[data-ev=winter] .bar{border-bottom:3px solid #fff;box-shadow:0 6px 20px #9fd8ff33}:root[data-ev=winter] .tabbar{border-top:3px solid #fff}
 #evbar{display:flex;gap:10px 18px;flex-wrap:wrap;justify-content:center;align-items:center;padding:8px 14px;margin:8px auto 0;max-width:1040px;border-radius:14px;background:linear-gradient(90deg,#ff7a18,#ff2bd6,#7a5cff);color:#fff;font-size:14px;box-shadow:0 0 22px #ff2bd655;animation:evpulse 2s ease-in-out infinite}#evbar[hidden]{display:none}#evbar .abuse{font-weight:900;letter-spacing:1px}@keyframes evpulse{50%{box-shadow:0 0 34px #ff7a1888}}
 :root[data-ev=gold]{--turf:#f5c542}:root[data-ev=gold] body{background:radial-gradient(1200px 600px at 50% -10%,#5a4300,transparent),var(--bg)}:root[data-ev=gold] .panel{border-color:#f5c54266}
 :root[data-ev=neon]{--turf:#ff2bd6}:root[data-ev=neon] body{background:radial-gradient(900px 500px at 15% 0%,#3b0a52,transparent),radial-gradient(900px 500px at 85% 0%,#062a5a,transparent),var(--bg)}:root[data-ev=neon] .panel{box-shadow:0 0 18px #ff2bd622;border-color:#ff2bd655}:root[data-ev=neon] h2{text-shadow:0 0 14px #ff2bd6aa}
@@ -1009,10 +1053,17 @@ const ABUSE_THEMES=["gold","neon","retro","winter"],abuseTheme=()=>ABUSE_THEMES[
 const evOn=k=>{if(abuseNow()&&["double_coins","double_points","half_packs","theme"].includes(k))return true;const e=((SITE&&SITE.events)||{})[k];return!!e&&new Date(e)>new Date()};
 const evUntil=k=>{const e=((SITE&&SITE.events)||{})[k];if(abuseNow()&&!(e&&new Date(e)>new Date()))return"18:00";return e?new Date(e).toLocaleString(ST.lang==="pt"?"pt-PT":ST.lang==="es"?"es-ES":"en-GB",{weekday:"short",hour:"2-digit",minute:"2-digit"}):""};
 const packPrice=pk=>evOn("half_packs")?Math.floor(pk.price/2):pk.price;
+// moving effects for each style: gold sparkles and coins, rising neon dots, falling pixels, snowflakes (off when Animations is off in Settings)
+function evFx(th){let fx=$("#evfx");if(!th){if(fx)fx.remove();return}if(fx&&fx.dataset.th===th)return;if(fx)fx.remove();
+fx=document.createElement("div");fx.id="evfx";fx.dataset.th=th;fx.setAttribute("aria-hidden","true");
+const sym={gold:["✨","🪙","⭐","✨"],neon:["●","◆","●","■"],retro:["■","▪","■","▪"],winter:["❄","❅","❆","❄"]}[th]||["✨"];
+fx.innerHTML=Array.from({length:22},(_,i)=>`<span class="evp" style="left:${(Math.random()*100).toFixed(1)}%;--s:${(10+Math.random()*16).toFixed(0)}px;--t:${(7+Math.random()*9).toFixed(1)}s;--dl:-${(Math.random()*12).toFixed(1)}s">${sym[i%sym.length]}</span>`).join("");document.body.appendChild(fx);
+if(th==="retro"&&!$("#retrofont")){const l=document.createElement("link");l.id="retrofont";l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap";document.head.appendChild(l)}}
+const STYLE_NAMES={gold:"🥇 Gold style",neon:"💜 Neon style",retro:"👾 Retro style",winter:"❄️ Winter style"};
 function applyEvents(){const R=document.documentElement;const manual=((SITE&&SITE.events)||{});R.dataset.ev=evOn("theme")?(manual.theme&&new Date(manual.theme)>new Date()?manual.theme_name:abuseTheme())||"":"";
-let bar=$("#evbar");if(!bar){bar=document.createElement("div");bar.id="evbar";bar.setAttribute("role","status");const a=$("#announce");(a||$("main")).before(bar)}
+evFx(R.dataset.ev);let bar=$("#evbar");if(!bar){bar=document.createElement("div");bar.id="evbar";bar.setAttribute("role","status");const a=$("#announce");(a||$("main")).before(bar)}
 const on=[["double_coins","🪙","Double coins"],["double_points","⭐","Double points"],["half_packs","🏷️","Half-price packs"]].filter(e=>evOn(e[0]));
-bar.innerHTML=(on.length?`<span class="abuse">🔥 ${L("ADMIN ABUSE!")}</span>`:"")+on.map(e=>`<span>${e[1]} <b>${L(e[2])}</b> ${L("until")} ${evUntil(e[0])}</span>`).join("");bar.hidden=!on.length||!me}
+bar.innerHTML=(on.length||R.dataset.ev?`<span class="abuse">🔥 ${L("ADMIN ABUSE!")}</span>`:"")+on.map(e=>`<span>${e[1]} <b>${L(e[2])}</b> ${L("until")} ${evUntil(e[0])}</span>`).join("")+(R.dataset.ev?`<span><b>${L(STYLE_NAMES[R.dataset.ev]||"")}</b></span>`:"");bar.hidden=(!on.length&&!R.dataset.ev)||!me}
 setInterval(()=>{if(SITE&&SITE.events)applyEvents()},60000);
 // points per game come from Supabase (admins can change them)
 async function loadGamePoints(){if(!SB)return;try{const{data}=await SB.from("game_points").select("game,weight");(data||[]).forEach(r=>{if(r.game in LBW||["head","hl","react","pass"].includes(r.game))LBW[r.game]=r.weight})}catch(e){}}
@@ -2022,6 +2073,10 @@ Fill all 11 positions.|Preencha as 11 posições.|Completa las 11 posiciones.
 Pick|Escolher|Elegir
 Pick your|Escolha o seu|Elige tu
 You don't have a player for this position yet. Open packs to find one!|Ainda não tem um jogador para esta posição. Abra pacotes para encontrar um!|Todavía no tienes un jugador para esta posición. ¡Abre sobres para encontrar uno!
+🥇 Gold style|🥇 Estilo dourado|🥇 Estilo dorado
+💜 Neon style|💜 Estilo néon|💜 Estilo neón
+👾 Retro style|👾 Estilo retro|👾 Estilo retro
+❄️ Winter style|❄️ Estilo inverno|❄️ Estilo invierno
 Admins|Admins|Admins`;
 TRX.split("\n").forEach(l=>{const p=l.split("|");if(p.length===3)DICT[p[0]]=[p[1],p[2]]});
 // Phrases with numbers or times in them
