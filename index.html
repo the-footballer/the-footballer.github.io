@@ -206,8 +206,9 @@ tr.z1 td:first-child{box-shadow:inset 4px 0 0 #1f9d55}tr.z2 td:first-child{box-s
 @media(max-width:520px){.dtslot{width:64px;min-height:80px}.dtrow{gap:6px}}
 .dtstats{display:flex;gap:8px;margin-bottom:10px}.dtstats .stat{flex:1}.dtcard .pbadge{background:#1f9d55}
 .clbtabs .chip[disabled]{opacity:.4}.clbscore{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0}.clbrank{max-height:60vh;overflow-y:auto;border:1px solid var(--line);border-radius:12px}
-.clbrow{display:grid;grid-template-columns:28px 1fr 34px 34px;align-items:center;gap:4px;padding:3px 8px;border-bottom:1px solid var(--line)}.clbrow .n{color:var(--mute);font-weight:700}.clbrow.z1{box-shadow:inset 4px 0 0 #1f9d55}.clbrow.z2{box-shadow:inset 4px 0 0 #e0a526}.clbrow.z3{box-shadow:inset 4px 0 0 #d64545}
-.clbrow.sel{background:#2a6df433}.clbteam{text-align:left;background:none;border:0;color:inherit;font:inherit;padding:6px 4px;cursor:pointer}.clbties{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+.clbrow{display:grid;grid-template-columns:30px 1fr 30px;align-items:center;gap:6px;width:100%;padding:10px 10px;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:background .15s}.clbrow:hover{background:#ffffff10}.clbic{text-align:center}
+.clbhint{margin:0 0 8px;padding:8px 12px;border-radius:12px;background:#ffe06622;border:1px solid #ffe06666}.clbrow.swapped{animation:clbflash .9s ease-out}@keyframes clbflash{0%{background:#1f9d55aa}100%{background:none}}.clbrow .n{color:var(--mute);font-weight:700}.clbrow.z1{box-shadow:inset 4px 0 0 #1f9d55}.clbrow.z2{box-shadow:inset 4px 0 0 #e0a526}.clbrow.z3{box-shadow:inset 4px 0 0 #d64545}
+.clbrow.sel{background:#ffe06640;outline:2px solid #ffe066;outline-offset:-2px;font-weight:800}.clbteam{text-align:left;background:none;border:0;color:inherit;font:inherit;padding:6px 4px;cursor:pointer}.clbties{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
 .clbtie{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:12px;padding:6px}.clbtie small{color:var(--mute)}.clbpick{flex:1;padding:8px;border-radius:10px;border:1.5px solid var(--line);background:none;color:inherit;font:inherit;cursor:pointer}.clbpick.on{background:#1f9d55;border-color:#1f9d55;color:#fff;font-weight:800}.clbchamp{font-size:20px;text-align:center}
 .hltop{text-align:center;margin:0 0 8px}.hlrow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.hlvs{font-size:22px;color:var(--mute)}.sfxbtn{font-size:22px;vertical-align:middle}
 .livebox{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:16px;background:linear-gradient(90deg,#d64545,#7a1f1f);color:#fff;font-size:18px;margin-bottom:10px}.livebox.off{background:var(--card);color:inherit;border:1px solid var(--line);font-size:15px}
@@ -1171,7 +1172,7 @@ ${DT.next?`<p class="sl">🔜 ${L("Your changed team starts tomorrow.")}</p>`:""
 ${(DT.top||[]).length?`<div class="panel"><h3>🏅 ${L("Dream team leaderboard")}</h3>${DT.top.map((r,i)=>`<div class="tourrow${r.me?" me":""}"><span>${i+1}</span><b data-notr>${esc(r.name)}</b><small>${Number(r.points).toLocaleString()} pts</small></div>`).join("")}</div>`:""}`}
 /* ---- CHAMPIONS LEAGUE BRACKET (Arcade): predict the league-phase table, then pick every knockout winner up to the champion.
    Saved to your account (cl_brackets) and scored against the real results as they happen. ---- */
-let CLB=null,CLBSEL=null,clbT=0;
+let CLB=null,CLBSEL=null,CLBFLASH=null,clbT=0;
 const CLB_ST=[["rank","1. League phase"],["po","2. Play-offs"],["r16","3. Round of 16"],["qf","4. Quarter-finals"],["sf","5. Semi-finals"],["f","6. Final"]];
 // round of 16 order keeps the top seeds apart until late: 1v(16/17), 8v(9/24), 4v(13/20), 5v(12/21), 2v(15/18), 7v(10/23), 3v(14/19), 6v(11/22)
 const R16S=[[0,7],[7,0],[3,4],[4,3],[1,6],[6,1],[2,5],[5,2]];
@@ -1196,7 +1197,7 @@ function clbRender(){const b=$("#board");if(!b||curGame!=="clb")return;if(!CLB)r
 const tabs=`<div class="chips clbtabs">${CLB_ST.map(([k,l],i)=>{const ok=i===0||CLB_ST.slice(1,i).every(([k2])=>(CLB.picks[k2]||[]).length&&CLB.picks[k2].every(Boolean));return`<button class="chip" data-clbst="${k}" aria-pressed="${st===k}" ${ok?"":"disabled"}>${L(l)}</button>`}).join("")}</div>`;
 let body="";
 if(!CLB.ranking.length)body=`<p class="sl">${L("The Champions League table hasn't loaded yet. Try again in a moment.")}</p>`;
-else if(st==="rank")body=`<p class="sl" style="margin-top:0">${L("Put the 36 teams in the order you think they'll finish the league phase. Tap a team, then tap another to swap them, or use the arrows.")}</p><div class="clbrank">${CLB.ranking.map((t,i)=>`<div class="clbrow ${i<8?"z1":i<24?"z2":"z3"}${CLBSEL===i?" sel":""}"><span class="n">${i+1}</span><button class="clbteam" data-clbsel="${i}">${team(t)}</button><button class="back" data-clbmv="${i}:-1" aria-label="Up" ${i?"":"disabled"}>▲</button><button class="back" data-clbmv="${i}:1" aria-label="Down" ${i<CLB.ranking.length-1?"":"disabled"}>▼</button></div>`).join("")}</div><button class="btn" data-clbst="po" style="margin-top:10px">${L("Next: knockout play-offs")} →</button>`;
+else if(st==="rank")body=`<p class="sl" style="margin-top:0">${L("Put the 36 teams in the order you think they'll finish the league phase.")}</p><p class="clbhint" role="status">${CLBSEL==null?"👆 "+L("Tap a team, then tap the team you want to swap it with."):"🔁 "+L("Now tap the team to swap with")+" <b>"+esc(CLB.ranking[CLBSEL])+"</b> ("+L("tap it again to cancel")+")"}</p><div class="clbrank">${CLB.ranking.map((t,i)=>`<button class="clbrow ${i<8?"z1":i<24?"z2":"z3"}${CLBSEL===i?" sel":""}${(CLBFLASH||[]).includes(i)?" swapped":""}" data-clbsel="${i}"><span class="n">${i+1}</span><span class="clbteam">${team(t)}</span><span class="clbic">${CLBSEL===i?"✋":CLBSEL!=null?"🔁":""}</span></button>`).join("")}</div><button class="btn" data-clbst="po" style="margin-top:10px">${L("Next: knockout play-offs")} →</button>`;
 else{const ties=clbTies(st),picks=CLB.picks[st]||[],nxt=CLB_ST[CLB_ST.findIndex(x=>x[0]===st)+1],all=ties.length&&picks.length===ties.length&&picks.every(Boolean);
 body=`<p class="sl" style="margin-top:0">${st==="f"?L("Pick your champion!"):L("Tap the team that goes through in each tie.")}</p><div class="clbties">${ties.map((t,i)=>`<div class="clbtie">${t.map(x=>`<button class="clbpick${picks[i]===x?" on":""}" data-clbpk="${st}:${i}:${esc(x||"")}" ${x?"":"disabled"}>${x?team(x):"?"}</button>`).join(`<small>v</small>`)}</div>`).join("")}</div>
 ${st==="f"&&picks[0]?`<p class="clbchamp">🏆 ${L("Your champion")}: <b>${esc(picks[0])}</b></p>`:""}${nxt&&all?`<button class="btn" data-clbst="${nxt[0]}" style="margin-top:10px">${L("Next")}: ${L(nxt[1].slice(3))} →</button>`:""}`}
@@ -2017,7 +2018,7 @@ Champions League bracket|Quadro da Liga dos Campeões|Cuadro de la Champions Lea
 League phase|Fase de liga|Fase liga
 Knockouts|Eliminatórias|Eliminatorias
 pts|pts|pts
-Put the 36 teams in the order you think they'll finish the league phase. Tap a team, then tap another to swap them, or use the arrows.|Ponha as 36 equipas pela ordem em que acha que vão acabar a fase de liga. Toque numa equipa e depois noutra para as trocar, ou use as setas.|Ordena los 36 equipos como crees que acabarán la fase liga. Toca un equipo y luego otro para cambiarlos, o usa las flechas.
+Put the 36 teams in the order you think they'll finish the league phase.|Ponha as 36 equipas pela ordem em que acha que vão acabar a fase de liga. Toque numa equipa e depois noutra para as trocar, ou use as setas.|Ordena los 36 equipos como crees que acabarán la fase liga. Toca un equipo y luego otro para cambiarlos, o usa las flechas.
 Next: knockout play-offs|Seguinte: play-off|Siguiente: play-off
 Pick your champion!|Escolha o seu campeão!|¡Elige a tu campeón!
 Tap the team that goes through in each tie.|Toque na equipa que passa em cada eliminatória.|Toca el equipo que pasa en cada eliminatoria.
@@ -2079,6 +2080,10 @@ You don't have a player for this position yet. Open packs to find one!|Ainda nã
 💜 Neon style|💜 Estilo néon|💜 Estilo neón
 👾 Retro style|👾 Estilo retro|👾 Estilo retro
 ❄️ Winter style|❄️ Estilo inverno|❄️ Estilo invierno
+Put the 36 teams in the order you think they'll finish the league phase.|Ponha as 36 equipas pela ordem em que acha que vão acabar a fase de liga.|Ordena los 36 equipos como crees que acabarán la fase liga.
+Tap a team, then tap the team you want to swap it with.|Toque numa equipa e depois na equipa com que a quer trocar.|Toca un equipo y luego el equipo con el que lo quieres cambiar.
+Now tap the team to swap with|Agora toque na equipa para trocar com|Ahora toca el equipo para cambiar con
+tap it again to cancel|toque outra vez para cancelar|tócalo otra vez para cancelar
 Admins|Admins|Admins`;
 TRX.split("\n").forEach(l=>{const p=l.split("|");if(p.length===3)DICT[p[0]]=[p[1],p[2]]});
 // Phrases with numbers or times in them
@@ -2393,7 +2398,7 @@ else if(d.fun){const[a1,a2]=d.fun.split(":");funDo(a1,a2);return}else if(d.trpic
 else if(d.shorts!==undefined){openShorts();return}
 else if(d.dtp){dreamPick(+d.dtp)}else if(d.dtslot!==undefined){DTSLOT=+d.dtslot}else if(d.dtsave!==undefined){saveDream();return}
 else if(d.clbst){CLB.step=d.clbst;clbClean();clbRender();return}
-else if(d.clbsel!==undefined){const i=+d.clbsel;if(CLBSEL==null)CLBSEL=i;else{const r=CLB.ranking;[r[i],r[CLBSEL]]=[r[CLBSEL],r[i]];CLBSEL=null;clbClean();clbSave()}clbRender();return}
+else if(d.clbsel!==undefined){const i=+d.clbsel;if(CLBSEL==null)CLBSEL=i;else if(CLBSEL===i)CLBSEL=null;else{const r=CLB.ranking;[r[i],r[CLBSEL]]=[r[CLBSEL],r[i]];CLBFLASH=[i,CLBSEL];CLBSEL=null;clbClean();clbSave();setTimeout(()=>{CLBFLASH=null},900)}const sc=($(".clbrank")||{}).scrollTop||0;clbRender();const rk=$(".clbrank");if(rk)rk.scrollTop=sc;return}
 else if(d.clbmv){const[i,dir]=d.clbmv.split(":").map(Number),r=CLB.ranking,j=i+dir;if(j>=0&&j<r.length){[r[i],r[j]]=[r[j],r[i]];CLBSEL=null;clbClean();clbSave()}clbRender();return}
 else if(d.clbpk){const[stp,i,...tm]=d.clbpk.split(":");CLB.picks[stp]=CLB.picks[stp]||[];CLB.picks[stp][+i]=tm.join(":");clbClean();clbSave();clbRender();return}
 else if(d.hl){hlGuess(+d.hl);return}else if(d.sfx!==undefined){SFX=!SFX;try{localStorage.setItem("rf_sfx",SFX?"1":"0")}catch(e){}t.textContent=SFX?"🔊":"🔇";return}
