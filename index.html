@@ -209,7 +209,7 @@ tr.z1 td:first-child{box-shadow:inset 4px 0 0 #1f9d55}tr.z2 td:first-child{box-s
 .clbrow{display:grid;grid-template-columns:30px 1fr 30px;align-items:center;gap:6px;width:100%;padding:10px 10px;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:background .15s}.clbrow:hover{background:#ffffff10}.clbic{text-align:center}
 .clbhint{margin:0 0 8px;padding:8px 12px;border-radius:12px;background:#ffe06622;border:1px solid #ffe06666}.clbrow.swapped{animation:clbflash .9s ease-out}@keyframes clbflash{0%{background:#1f9d55aa}100%{background:none}}.clbrow .n{color:var(--mute);font-weight:700}.clbrow.z1{box-shadow:inset 4px 0 0 #1f9d55}.clbrow.z2{box-shadow:inset 4px 0 0 #e0a526}.clbrow.z3{box-shadow:inset 4px 0 0 #d64545}
 .clbrow.sel{background:#ffe06640;outline:2px solid #ffe066;outline-offset:-2px;font-weight:800}.clbteam{text-align:left;background:none;border:0;color:inherit;font:inherit;padding:6px 4px;cursor:pointer}.clbties{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
-.clbtie{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:12px;padding:6px}.clbtie small{color:var(--mute)}.clbpick{flex:1;padding:8px;border-radius:10px;border:1.5px solid var(--line);background:none;color:inherit;font:inherit;cursor:pointer}.clbpick.on{background:#1f9d55;border-color:#1f9d55;color:#fff;font-weight:800}.clbchamp{font-size:20px;text-align:center}
+.clbtie{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:12px;padding:6px}.clbtie small{color:var(--mute)}.clbpick{flex:1;padding:8px;border-radius:10px;border:1.5px solid var(--line);background:none;color:inherit;font:inherit;cursor:pointer}.clbpick.on{background:#1f9d55;border-color:#1f9d55;color:#fff;font-weight:800}.clbchamp{font-size:20px;text-align:center;margin-bottom:2px}.clbworth{text-align:center;margin:0 0 10px;color:var(--mute)}.clbtop{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px}.clbbar{display:grid;grid-template-columns:130px 1fr 48px;gap:8px;align-items:center;margin-top:6px;font-size:14px}.clbbar i{height:8px;border-radius:99px;background:linear-gradient(90deg,#1f9d55 var(--w),#ffffff18 var(--w))}.clbbar b{text-align:right}
 .hltop{text-align:center;margin:0 0 8px}.hlrow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.hlvs{font-size:22px;color:var(--mute)}.sfxbtn{font-size:22px;vertical-align:middle}
 .livebox{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:16px;background:linear-gradient(90deg,#d64545,#7a1f1f);color:#fff;font-size:18px;margin-bottom:10px}.livebox.off{background:var(--card);color:inherit;border:1px solid var(--line);font-size:15px}
 .livedot{font-weight:900;animation:evpulse 1.4s infinite}.livet{margin-left:auto;font-size:26px;font-weight:900;font-variant-numeric:tabular-nums}.drill.now{border-color:#d64545;box-shadow:0 0 0 2px #d6454555}.drill.next{opacity:.75}.dhead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}.dhead small{color:var(--mute)}
@@ -1079,11 +1079,12 @@ const kindChips=(attr,cur)=>`<div class="chips kindchips">${[["best","🏅","Bes
 /* ---- ADMIN > FUN: points per Arcade game, special events, live training ---- */
 let FUNMSG="";
 async function funLoad(){const[a,b]=await Promise.all([SB.from("game_points").select("game,weight").order("game"),SB.from("site_config").select("events,training").eq("id",1).maybeSingle()]);
-if(a.error||b.error)throw new Error("Run supabase-big-update.sql in Supabase first.");return{points:a.data||[],events:(b.data||{}).events||{},training:(b.data||{}).training||{}}}
+if(a.error||b.error)throw new Error("Run supabase-big-update.sql in Supabase first.");const cm=await SB.from("site_config").select("cl_mult").eq("id",1).maybeSingle();return{points:a.data||[],events:(b.data||{}).events||{},training:(b.data||{}).training||{},cl_mult:cm.error?null:(cm.data||{}).cl_mult}}
 async function funDo(kind,arg){FUNMSG="";try{let r;
 if(kind==="pts"){const v=parseInt(($("#gp-"+arg)||{}).value,10);r=await SB.rpc("admin_set_game_points",{p_game:arg,p_weight:v});if(!r.error)FUNMSG="Saved: "+arg+" = "+v+" points per score"}
 else if(kind==="ev"){const hrs=parseInt(($("#evh-"+arg)||{}).value||"0",10);r=await SB.rpc("admin_set_event",{p_event:arg,p_hours:hrs,p_theme:arg==="theme"?($("#ev-theme")||{}).value:null});if(!r.error)FUNMSG=hrs?"Event started":"Event stopped"}
 else if(kind==="all"){const hrs=parseInt(($("#evh-all")||{}).value||"1",10);for(const k of["double_coins","double_points","half_packs"]){r=await SB.rpc("admin_set_event",{p_event:k,p_hours:hrs,p_theme:null});if(r.error)break}if(!r.error)r=await SB.rpc("admin_set_event",{p_event:"theme",p_hours:hrs,p_theme:abuseTheme()});if(!r.error)FUNMSG="🔥 Admin Abuse started"}
+else if(kind==="clm"){r=await SB.rpc("admin_set_cl_mult",{p_mult:parseFloat(($("#clm")||{}).value)});if(!r.error)FUNMSG="CL bracket multiplier saved"}
 else if(kind==="evstop"){r=await SB.rpc("admin_set_event",{p_event:arg,p_hours:0,p_theme:null});if(!r.error)FUNMSG="Event stopped"}
 else if(kind==="tr"){const T=Object.assign({},(AD.fun&&AD.fun.training)||{});
  if(arg==="hours"){T.hours=(($("#tr-hours")||{}).value||"").split(/[ ,]+/).map(Number).filter(h=>Number.isInteger(h)&&h>=0&&h<24).slice(0,12)}
@@ -1100,6 +1101,7 @@ return`${FUNMSG?`<p class="amsg" role="status">${esc(FUNMSG)}</p>`:""}
 <div class="evrow"><b>🔥 Full Admin Abuse</b><input id="evh-all" type="number" min="1" max="720" value="1" aria-label="Hours"> hours <button class="btn" data-fun="all:x">Start everything now</button></div>
 ${evRow("double_coins","🪙 Double coins")}${evRow("double_points","⭐ Double points")}${evRow("half_packs","🏷️ Half-price packs")}
 ${evRow("theme","🎨 Different style",`<select id="ev-theme" aria-label="Style">${[["gold","Gold"],["neon","Neon"],["retro","Retro"],["winter","Winter"]].map(t=>`<option value="${t[0]}" ${ev.theme_name===t[0]?"selected":""}>${t[1]}</option>`).join("")}</select>`)}</div>
+<div class="panel"><h3>🏆 CL bracket champion points</h3><p class="sl" style="margin-top:0">If your champion wins the final you get: % of fans who picked the same champion × this number.</p>${D.cl_mult==null?`<p class="sl">⚠️ Run supabase-cl-champion.sql in Supabase to use this.</p>`:`<div class="evrow"><b>Multiplier</b><input id="clm" type="number" min="0" max="100" step="0.5" value="${D.cl_mult}"><button class="btn ghost" data-fun="clm:x">Save</button></div>`}</div>
 <div class="panel"><h3>🎮 Points per Arcade game</h3><p class="sl" style="margin-top:0">Points for each unit of score (e.g. each goal or each save). Used by both leaderboards, both tournaments and coins (points ÷ 5).</p>
 <div class="gpts">${(D.points||[]).filter(r=>r.game!=="pred").map(r=>`<label><span>${esc(gn(r.game))}</span><input id="gp-${esc(r.game)}" type="number" min="0" max="1000" value="${r.weight}"><button class="btn ghost" data-fun="pts:${esc(r.game)}">Save</button></label>`).join("")}</div></div>
 <div class="panel"><h3>🔴 Live training</h3><p class="sl" style="margin-top:0">Sessions start at these hours (Portugal time) and last 1 hour. Today's drills are picked at random unless you choose them.</p>
@@ -1172,7 +1174,10 @@ ${DT.next?`<p class="sl">🔜 ${L("Your changed team starts tomorrow.")}</p>`:""
 ${(DT.top||[]).length?`<div class="panel"><h3>🏅 ${L("Dream team leaderboard")}</h3>${DT.top.map((r,i)=>`<div class="tourrow${r.me?" me":""}"><span>${i+1}</span><b data-notr>${esc(r.name)}</b><small>${Number(r.points).toLocaleString()} pts</small></div>`).join("")}</div>`:""}`}
 /* ---- CHAMPIONS LEAGUE BRACKET (Arcade): predict the league-phase table, then pick every knockout winner up to the champion.
    Saved to your account (cl_brackets) and scored against the real results as they happen. ---- */
-let CLB=null,CLBSEL=null,CLBFLASH=null,clbT=0;
+let CLB=null,CLBSEL=null,CLBFLASH=null,clbT=0,CLBSTATS=null;
+// champion points: % of fans who picked the same champion x the multiplier admins set (default 2)
+async function clbStats(){if(!SB||!me)return;const{data,error}=await SB.rpc("cl_champion_stats");if(!error&&data){CLBSTATS=data;if(curGame==="clb"&&$("#board"))clbRender()}}
+const champPct=t=>{const S=CLBSTATS;return S&&S.total?Math.round((S.teams[t]||0)*1000/S.total)/10:0},champMult=()=>CLBSTATS?Number(CLBSTATS.mult):2,champPts=t=>Math.round(champPct(t)*champMult());
 const CLB_ST=[["rank","1. League phase"],["po","2. Play-offs"],["r16","3. Round of 16"],["qf","4. Quarter-finals"],["sf","5. Semi-finals"],["f","6. Final"]];
 // round of 16 order keeps the top seeds apart until late: 1v(16/17), 8v(9/24), 4v(13/20), 5v(12/21), 2v(15/18), 7v(10/23), 3v(14/19), 6v(11/22)
 const R16S=[[0,7],[7,0],[3,4],[4,3],[1,6],[6,1],[2,5],[5,2]];
@@ -1183,16 +1188,16 @@ const prev={qf:"r16",sf:"qf",f:"sf"}[st],w=p[prev]||[];return[...Array(w.length/
 const clbTeams=()=>(DATA.leagues["Champions League"]||[]).map(r=>r[0]);
 async function clbStart(){const b=$("#board");if(!b)return;if(!CLB){const t=clbTeams();CLB={ranking:t.slice(),picks:{},step:"rank"};
 try{const c=JSON.parse(localStorage.getItem("rf_clb_"+PK())||"null");if(c&&c.ranking&&c.ranking.length===t.length)CLB=Object.assign(CLB,c)}catch(e){}
-if(SB&&me){const{data}=await SB.from("cl_brackets").select("ranking,picks").eq("user_id",me.id).maybeSingle();if(data&&data.ranking&&data.ranking.length===t.length)CLB=Object.assign(CLB,{ranking:data.ranking,picks:data.picks||{}})}}
+clbStats();if(SB&&me){const{data}=await SB.from("cl_brackets").select("ranking,picks").eq("user_id",me.id).maybeSingle();if(data&&data.ranking&&data.ranking.length===t.length)CLB=Object.assign(CLB,{ranking:data.ranking,picks:data.picks||{}})}}
 clbRender()}
-function clbSave(){try{localStorage.setItem("rf_clb_"+PK(),JSON.stringify(CLB))}catch(e){}clearTimeout(clbT);if(SB&&me)clbT=setTimeout(()=>SB.from("cl_brackets").upsert({user_id:me.id,ranking:CLB.ranking,picks:CLB.picks,updated_at:new Date().toISOString()}).then(()=>{},()=>{}),800)}
+function clbSave(){try{localStorage.setItem("rf_clb_"+PK(),JSON.stringify(CLB))}catch(e){}clearTimeout(clbT);if(SB&&me)clbT=setTimeout(()=>SB.from("cl_brackets").upsert({user_id:me.id,ranking:CLB.ranking,picks:CLB.picks,updated_at:new Date().toISOString()}).then(()=>clbStats(),()=>{}),800)}
 // a pick only stays if both teams still meet in that tie; later rounds are cleared when an earlier pick changes
 function clbClean(){["po","r16","qf","sf","f"].forEach(st=>{const ties=clbTies(st),old=CLB.picks[st]||[];CLB.picks[st]=ties.map((t,i)=>t.includes(old[i])&&t[0]&&t[1]?old[i]:null)})}
 function clbScore(){const real=clbTeams(),r=CLB.ranking;let rank=0;r.forEach((t,i)=>{const j=real.indexOf(t);if(j<0)return;const z=k=>k<8?0:k<24?1:2;if(i===j)rank+=3;else if(z(i)===z(j))rank+=1});
 const ko=DATA.ko||[],won=st=>{const set=new Set();const ties=new Map();ko.filter(m=>m.s===st&&m.st==="FINISHED").forEach(m=>{const k=[m.h,m.a].sort().join("|");if(!ties.has(k))ties.set(k,[]);ties.get(k).push(m)});
 ties.forEach(legs=>{const A=legs[0].h,B=legs[0].a,g=t=>legs.reduce((s,m)=>s+(m.h===t?m.hs:m.as),0),last=legs[legs.length-1];const w=g(A)>g(B)?A:g(B)>g(A)?B:last.w==="HOME_TEAM"?last.h:last.a;set.add(w)});return set};
-const pts={po:[ "PLAYOFFS",5],r16:["LAST_16",10],qf:["QUARTER_FINALS",15],sf:["SEMI_FINALS",20],f:["FINAL",30]};let kop=0;
-Object.entries(pts).forEach(([st,[s,v]])=>{const w=won(s);(CLB.picks[st]||[]).forEach(t=>{if(t&&w.has(t))kop+=v})});return{rank,kop}}
+const pts={po:["PLAYOFFS",5],r16:["LAST_16",10],qf:["QUARTER_FINALS",15],sf:["SEMI_FINALS",20]};let kop=0;
+Object.entries(pts).forEach(([st,[s,v]])=>{const w=won(s);(CLB.picks[st]||[]).forEach(t=>{if(t&&w.has(t))kop+=v})});const ch=(CLB.picks.f||[])[0];if(ch&&won("FINAL").has(ch))kop+=champPts(ch);return{rank,kop}}
 function clbRender(){const b=$("#board");if(!b||curGame!=="clb")return;if(!CLB)return clbStart();const st=CLB.step,sc=clbScore();
 const tabs=`<div class="chips clbtabs">${CLB_ST.map(([k,l],i)=>{const ok=i===0||CLB_ST.slice(1,i).every(([k2])=>(CLB.picks[k2]||[]).length&&CLB.picks[k2].every(Boolean));return`<button class="chip" data-clbst="${k}" aria-pressed="${st===k}" ${ok?"":"disabled"}>${L(l)}</button>`}).join("")}</div>`;
 let body="";
@@ -1200,8 +1205,8 @@ if(!CLB.ranking.length)body=`<p class="sl">${L("The Champions League table hasn'
 else if(st==="rank")body=`<p class="sl" style="margin-top:0">${L("Put the 36 teams in the order you think they'll finish the league phase.")}</p><p class="clbhint" role="status">${CLBSEL==null?"👆 "+L("Tap a team, then tap the team you want to swap it with."):"🔁 "+L("Now tap the team to swap with")+" <b>"+esc(CLB.ranking[CLBSEL])+"</b> ("+L("tap it again to cancel")+")"}</p><div class="clbrank">${CLB.ranking.map((t,i)=>`<button class="clbrow ${i<8?"z1":i<24?"z2":"z3"}${CLBSEL===i?" sel":""}${(CLBFLASH||[]).includes(i)?" swapped":""}" data-clbsel="${i}"><span class="n">${i+1}</span><span class="clbteam">${team(t)}</span><span class="clbic">${CLBSEL===i?"✋":CLBSEL!=null?"🔁":""}</span></button>`).join("")}</div><button class="btn" data-clbst="po" style="margin-top:10px">${L("Next: knockout play-offs")} →</button>`;
 else{const ties=clbTies(st),picks=CLB.picks[st]||[],nxt=CLB_ST[CLB_ST.findIndex(x=>x[0]===st)+1],all=ties.length&&picks.length===ties.length&&picks.every(Boolean);
 body=`<p class="sl" style="margin-top:0">${st==="f"?L("Pick your champion!"):L("Tap the team that goes through in each tie.")}</p><div class="clbties">${ties.map((t,i)=>`<div class="clbtie">${t.map(x=>`<button class="clbpick${picks[i]===x?" on":""}" data-clbpk="${st}:${i}:${esc(x||"")}" ${x?"":"disabled"}>${x?team(x):"?"}</button>`).join(`<small>v</small>`)}</div>`).join("")}</div>
-${st==="f"&&picks[0]?`<p class="clbchamp">🏆 ${L("Your champion")}: <b>${esc(picks[0])}</b></p>`:""}${nxt&&all?`<button class="btn" data-clbst="${nxt[0]}" style="margin-top:10px">${L("Next")}: ${L(nxt[1].slice(3))} →</button>`:""}`}
-b.innerHTML=`<h3 style="margin-top:0">🏆 ${L("Champions League bracket")}</h3>${tabs}<div class="clbscore"><span>📊 ${L("League phase")}: <b>${sc.rank}</b> ${L("pts")}</span><span>⚔️ ${L("Knockouts")}: <b>${sc.kop}</b> ${L("pts")}</span></div><p class="sl" style="margin:0 0 10px;font-size:12px">${L("Scored against the real results as they happen: 3 pts for an exact league position, 1 for the right zone; 5/10/15/20/30 for each team you picked to win a play-off, round of 16, quarter-final, semi-final and the final.")}</p>${body}`}
+${st==="f"&&picks[0]?`<p class="clbchamp">🏆 ${L("Your champion")}: <b>${esc(picks[0])}</b></p><p class="clbworth">${L("Picked by")} <b>${champPct(picks[0])}%</b> ${L("of fans")} × ${champMult()} = <b>${champPts(picks[0])} ${L("pts")}</b> ${L("if they win the final")}</p>`:""}${st==="f"&&CLBSTATS&&CLBSTATS.total?`<div class="clbtop"><b>📊 ${L("Most picked champions")}</b> <small>(${CLBSTATS.total} ${L("fans")})</small>${Object.entries(CLBSTATS.teams).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([t,n])=>`<div class="clbbar"><span>${team(t)}</span><i style="--w:${Math.round(n*100/CLBSTATS.total)}%"></i><b>${champPct(t)}%</b></div>`).join("")}</div>`:""}${nxt&&all?`<button class="btn" data-clbst="${nxt[0]}" style="margin-top:10px">${L("Next")}: ${L(nxt[1].slice(3))} →</button>`:""}`}
+b.innerHTML=`<h3 style="margin-top:0">🏆 ${L("Champions League bracket")}</h3>${tabs}<div class="clbscore"><span>📊 ${L("League phase")}: <b>${sc.rank}</b> ${L("pts")}</span><span>⚔️ ${L("Knockouts")}: <b>${sc.kop}</b> ${L("pts")}</span></div><p class="sl" style="margin:0 0 10px;font-size:12px">${L("Scored against the real results as they happen: 3 pts for an exact league position, 1 for the right zone; 5/10/15/20 for each team you picked to win a play-off, round of 16, quarter-final and semi-final.")} ${L("Your champion is worth the % of fans who picked them ×")} ${champMult()}</p>${body}`}
 /* ---- TRAINING: drill library, a training generator, and live sessions (same drill for everyone at the same time) ---- */
 // f = focus, lv = lowest level (0 beginner, 1 intermediate, 2 advanced), p = players [min,max], m = minutes
 const DRILLS=[
@@ -2024,7 +2029,7 @@ Pick your champion!|Escolha o seu campeão!|¡Elige a tu campeón!
 Tap the team that goes through in each tie.|Toque na equipa que passa em cada eliminatória.|Toca el equipo que pasa en cada eliminatoria.
 Your champion|O seu campeão|Tu campeón
 Play-offs|Play-off|Play-off
-Scored against the real results as they happen: 3 pts for an exact league position, 1 for the right zone; 5/10/15/20/30 for each team you picked to win a play-off, round of 16, quarter-final, semi-final and the final.|Pontuado com os resultados reais à medida que acontecem: 3 pts por posição exata, 1 pela zona certa; 5/10/15/20/30 por cada equipa que escolheu para ganhar o play-off, oitavos, quartos, meias e a final.|Puntuado con los resultados reales a medida que ocurren: 3 pts por posición exacta, 1 por la zona correcta; 5/10/15/20/30 por cada equipo que elegiste para ganar el play-off, octavos, cuartos, semis y la final.
+Scored against the real results as they happen: 3 pts for an exact league position, 1 for the right zone; 5/10/15/20 for each team you picked to win a play-off, round of 16, quarter-final and semi-final.|Pontuado com os resultados reais à medida que acontecem: 3 pts por posição exata, 1 pela zona certa; 5/10/15/20 por cada equipa que escolheu para ganhar o play-off, oitavos, quartos e meias.|Puntuado con los resultados reales a medida que ocurren: 3 pts por posición exacta, 1 por la zona correcta; 5/10/15/20 por cada equipo que elegiste para ganar el play-off, octavos, cuartos y semis.
 The Champions League table hasn't loaded yet. Try again in a moment.|A tabela da Champions ainda não carregou. Tente daqui a pouco.|La tabla de la Champions aún no ha cargado. Inténtalo en un momento.
 🎥 Videos & drills|🎥 Vídeos e exercícios|🎥 Vídeos y ejercicios
 🛠️ Training generator|🛠️ Gerador de treinos|🛠️ Generador de entrenamientos
@@ -2084,6 +2089,12 @@ Put the 36 teams in the order you think they'll finish the league phase.|Ponha a
 Tap a team, then tap the team you want to swap it with.|Toque numa equipa e depois na equipa com que a quer trocar.|Toca un equipo y luego el equipo con el que lo quieres cambiar.
 Now tap the team to swap with|Agora toque na equipa para trocar com|Ahora toca el equipo para cambiar con
 tap it again to cancel|toque outra vez para cancelar|tócalo otra vez para cancelar
+Picked by|Escolhido por|Elegido por
+of fans|dos adeptos|de los aficionados
+if they win the final|se ganharem a final|si ganan la final
+Most picked champions|Campeões mais escolhidos|Campeones más elegidos
+fans|adeptos|aficionados
+Your champion is worth the % of fans who picked them ×|O seu campeão vale a % de adeptos que o escolheram ×|Tu campeón vale el % de aficionados que lo eligieron ×
 Admins|Admins|Admins`;
 TRX.split("\n").forEach(l=>{const p=l.split("|");if(p.length===3)DICT[p[0]]=[p[1],p[2]]});
 // Phrases with numbers or times in them
