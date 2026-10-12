@@ -142,7 +142,7 @@ tr.z1 td:first-child{box-shadow:inset 4px 0 0 #1f9d55}tr.z2 td:first-child{box-s
 .kindchips{margin-bottom:8px}.evrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--line)}.evrow b{min-width:160px}.evrow input,.evrow select{width:70px;padding:6px 8px;border-radius:10px;border:1.5px solid var(--line);background:rgba(0,0,0,.2);color:var(--ink);font:inherit}.evon{color:#5ad18a;font-weight:700}
 .gpts{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}.gpts label{display:flex;align-items:center;gap:8px}.gpts span{flex:1}.gpts input{width:70px;padding:6px 8px;border-radius:10px;border:1.5px solid var(--line);background:rgba(0,0,0,.2);color:var(--ink);font:inherit}
 .trpick{display:flex;flex-wrap:wrap;gap:6px}.trpick .chip.on{background:var(--turf,#2a6df4);color:#fff;border-color:transparent}
-.shortsbtn{margin-left:8px}.noscroll{overflow:hidden}
+.shortsbtn{margin-left:8px}.short.noimg .shtxt{align-self:center;padding:70px 26px;max-width:760px}.short.noimg h2{font-size:clamp(30px,7vw,58px);line-height:1.12;margin:14px 0 18px}.short.noimg p{font-size:clamp(17px,2.6vw,22px);color:#eee}.short.noimg .shsrc{font-size:15px;color:#fffc}.shtitle{position:fixed;top:18px;left:0;right:0;text-align:center;z-index:101;color:#fff;font-weight:800;pointer-events:none;text-shadow:0 1px 6px #000a}.shcount{top:52px}.noscroll{overflow:hidden}
 .shorts{position:fixed;inset:0;z-index:100;background:#000}.shscroll{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;outline:none}.short{position:relative;height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
 .shbg{position:absolute;inset:0;background:#0b1430 center/cover no-repeat;transform:scale(1.04)}.shshade{position:absolute;inset:0;background:linear-gradient(180deg,#0000 30%,#000d 75%)}
 .shtxt{position:relative;max-width:640px;width:100%;padding:24px 20px 60px;color:#fff}.shtxt h2{font-size:clamp(22px,4vw,32px);margin:6px 0 10px;line-height:1.2}.shtxt p{color:#ddd;margin:0 0 14px}.shsrc{font-size:13px;color:#bbb;font-weight:700}.shbtns{display:flex;gap:8px;flex-wrap:wrap}
@@ -156,6 +156,10 @@ tr.z1 td:first-child{box-shadow:inset 4px 0 0 #1f9d55}tr.z2 td:first-child{box-s
 @keyframes flipin{to{transform:rotateY(0)}}.flip.big .flip-front .pc{animation:glow 1.6s calc(var(--d) + .7s) ease-in-out infinite}@keyframes glow{50%{box-shadow:0 0 30px var(--rc),0 0 60px var(--rc)}}
 .flip-front{position:relative}.spark{position:absolute;top:50%;left:50%;width:8px;height:8px;border-radius:50%;background:#ffe066;opacity:0;animation:spark 1s calc(var(--d) + .6s) ease-out forwards}.spark.s2{background:#5ad1ff;animation-name:spark2}.spark.s3{background:#ff2bd6;animation-name:spark3}
 @keyframes spark{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(-80px,-90px) scale(.3)}}@keyframes spark2{0%{opacity:1}100%{opacity:0;transform:translate(85px,-70px) scale(.3)}}@keyframes spark3{0%{opacity:1}100%{opacity:0;transform:translate(10px,-110px) scale(.3)}}
+.dtpitch{margin:10px 0;padding:14px 8px;border-radius:16px;background:repeating-linear-gradient(180deg,#16703f 0 40px,#1b7d47 40px 80px);border:2px solid #ffffff40;display:flex;flex-direction:column;gap:12px}.dtrow{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.dtslot{width:78px;min-height:92px;border-radius:12px;border:2px dashed #ffffff80;background:#0005;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:inherit;cursor:pointer;padding:4px;position:relative}.dtslot small{font-size:11px;font-weight:800;opacity:.85}.dtslot b{font-size:20px}.dtslot span{font-size:12px;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dtslot.full{border:2px solid var(--rc,#fff);background:linear-gradient(160deg,#0b1430e6,#1b2b5ce6)}.dtslot.on{outline:3px solid #ffe066;outline-offset:2px}.dtslot i{position:absolute;top:-8px;right:-8px;background:#1f9d55;border-radius:99px;padding:1px 6px;font-size:11px;font-style:normal;font-weight:800}
+@media(max-width:520px){.dtslot{width:64px;min-height:80px}.dtrow{gap:6px}}
 .dtstats{display:flex;gap:8px;margin-bottom:10px}.dtstats .stat{flex:1}.dtcard .pbadge{background:#1f9d55}
 .clbtabs .chip[disabled]{opacity:.4}.clbscore{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0}.clbrank{max-height:60vh;overflow-y:auto;border:1px solid var(--line);border-radius:12px}
 .clbrow{display:grid;grid-template-columns:28px 1fr 34px 34px;align-items:center;gap:4px;padding:3px 8px;border-bottom:1px solid var(--line)}.clbrow .n{color:var(--mute);font-weight:700}.clbrow.z1{box-shadow:inset 4px 0 0 #1f9d55}.clbrow.z2{box-shadow:inset 4px 0 0 #e0a526}.clbrow.z3{box-shadow:inset 4px 0 0 #d64545}
@@ -387,7 +391,7 @@ function newsPage(){const nm=newsMode||(PREF()?"mine":"all"),secs=nm==="mine"?["
 const L=ALL().filter(n=>nm==="mine"?hasPick(n,cat==="All"?"":cat):(cat==="All"||inLeague(n,cat))),h=L[0];
 const lk=n=>`href="#" data-open="${esc(n.id)}"`;// stories open on The Footballer first
 const sc=[...DATA.live.map(x=>`🔴 ${x.h} ${x.hs}-${x.as} ${x.a}`),...pickM(DATA.res,"big",6,true).map(x=>`${x.h} ${x.hs}-${x.as} ${x.a}`),...pickM(DATA.fx.filter(x=>new Date(x.t)>Date.now()),"big",6).map(f=>`${f.h} v ${f.a} ${day(f.t).slice(0,3)} ${hm(f.t)}`)];
-const top=modeBar("data-nm",nm,"Your news","All news")+`<button class="btn shortsbtn" data-shorts>📱 Shorts</button>`;
+const top=modeBar("data-nm",nm,"Your news","All news")+`<button class="chip shortsbtn" data-shorts aria-pressed="false">📱 Feed</button>`;
 if(nm==="mine"&&!PREF())return top+needPicks("the latest news");
 return top+`<div class="tick"><b>LATEST</b><div class="tk"><span>${L.slice(0,10).map(n=>esc(n.t)).join("   •   ")}</span></div></div><div class="rec"><div class="rsc"><b>MATCHES</b>${sc.map(x=>`<span>${esc(x)}</span>`).join("")}</div><div class="rnav">${secs.map(x=>`<button data-cat="${esc(x)}" aria-pressed="${x===cat}">${esc(x)}</button>`).join("")}${nm==="mine"?'<button data-t="setup" title="Change your teams">✏️ Edit</button>':""}</div>${h?`<div class="rtop"><div class="rwrap"><a class="rlead" ${lk(h)} ${bg(h.img)}><div class="remo">${h.img?"":h.e}</div><div class="rin"><span class="rk w">${esc(h.cat)} · ${ago(h.d)}</span><h2>${esc(h.t)}</h2><p>${esc(h.s)}</p></div></a>${svBtn(h)}</div><div class="rlast"><h3>LATEST</h3>${L.slice(1,8).map(n=>`<div class="srow"><a ${lk(n)}><time>${hm(n.d)}</time><span>${esc(n.t)}</span></a>${svBtn(n)}</div>`).join("")}</div></div><div class="rgrid">${L.slice(1,13).map(n=>`<div class="rwrap"><a class="rcard" ${lk(n)}><div class="rimg" ${bg(n.img)}>${n.img?"":n.e}</div><span class="rk">${esc(n.cat)} · ${ago(n.d)}</span><h4>${esc(n.t)}</h4><p>${esc(n.s)}</p></a>${svBtn(n)}</div>`).join("")}</div>${L.length>13?`<div class="rmost"><h3>MORE NEWS</h3>${L.slice(13,25).map(n=>`<div class="srow"><a ${lk(n)}><em style="font-size:14px;min-width:44px">${hm(n.d)}</em>${esc(n.t)}</a>${svBtn(n)}</div>`).join("")}</div>`:""}`:'<p class="empty" style="padding:30px">No stories in this section right now.</p>'}</div><div class="live" style="margin-top:12px"><span></span>${liveStatus}</div>`}
 const SNAP={t:"Snapshot 2 Oct 2026",leagues:{
@@ -1049,21 +1053,35 @@ ${evRow("theme","🎨 Different style",`<select id="ev-theme" aria-label="Style"
 <div class="evrow"><b>Start a session now</b>${T.now&&Date.now()-new Date(T.now)<36e5?`<span class="evon">Live since ${new Date(T.now).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</span><button class="btn ghost" data-fun="tr:stopnow">Stop</button>`:`<button class="btn" data-fun="tr:now">Go live now</button>`}</div>
 <p class="sl"><b>Today's drills</b> ${T.drills&&T.day===tDayPT()?"(chosen by an admin)":"(random)"}: tap up to 6 in order, then save.</p><div class="trpick">${DRILLS.map((d,i)=>`<button class="chip${T.drills&&T.day===tDayPT()&&T.drills.includes(i)?" on":""}" data-trpick="${i}">${esc(d.n)}</button>`).join("")}</div>
 <div class="row" style="justify-content:flex-start;gap:10px;margin-top:10px"><button class="btn" data-fun="tr:drills">Save today's drills</button><button class="btn ghost" data-fun="tr:cleardrills">Back to random</button></div></div>`}
-/* ---- NEWS SHORTS: one story per screen, swipe or scroll up for the next (like YouTube Shorts). Arrow keys work on a computer. ---- */
-function openShorts(startId){const list=ALL().filter(n=>n.t);if(!list.length){toast("No stories in this section right now.");return}
-let i=Math.max(0,list.findIndex(n=>n.id===startId));const ov=document.createElement("div");ov.className="shorts";ov.setAttribute("role","dialog");ov.setAttribute("aria-label","News shorts");
-const slide=(n,k)=>`<section class="short" data-k="${k}"><div class="shbg" ${bg(n.img)}></div><div class="shshade"></div><div class="shtxt"><span class="shsrc">${esc(n.cat||"")} · ${n.d?ago(n.d):""}</span><h2>${esc(n.t)}</h2>${n.s?`<p>${esc(n.s)}</p>`:""}<div class="shbtns"><button class="btn" data-shopen="${esc(n.id)}">📖 ${L("Read story")}</button><button class="btn ghost" data-shsave="${esc(n.id)}">${isSaved(n.id)?"★":"☆"} ${L("Save")}</button>${me?`<button class="btn ghost" data-shshare="${esc(n.id)}">💬 ${L("Share")}</button>`:""}</div></div><span class="shcount">${k+1} / ${list.length}</span></section>`;
-ov.innerHTML=`<button class="shclose" aria-label="Close">✕</button><div class="shscroll">${list.map(slide).join("")}</div><p class="shhint">${L("Swipe up for the next story")}</p>`;
-document.body.appendChild(ov);document.body.classList.add("noscroll");const sc=ov.querySelector(".shscroll");sc.scrollTop=i*sc.clientHeight;sc.focus();
-const close=()=>{ov.remove();document.body.classList.remove("noscroll");document.removeEventListener("keydown",key)};
+/* ---- NEWS FEED: one story per screen, swipe or scroll up for the next (like YouTube Shorts). Arrow keys work on a computer.
+   Made for you: stories about your teams come first, and it learns what you like (stories about teams you read, save or
+   stay on move up). Kept on this device. Stories without a picture fill the screen with big text. ---- */
+const FEEDK=()=>"rf_feedlike_"+PK();
+const feedLikes=()=>{try{return JSON.parse(localStorage.getItem(FEEDK())||"{}")}catch(e){return{}}};
+let FEEDTEAMS=null;
+const storyTeams=n=>{if(!FEEDTEAMS)FEEDTEAMS=allTeams().map(x=>[x,bnorm(x)]).filter(x=>x[1].length>2);const t=" "+bnorm(n.t+" "+(n.s||""))+" ";return FEEDTEAMS.filter(([,b])=>t.includes(" "+b+" ")).map(x=>x[0])};
+function likeStory(n,w){const lk=feedLikes();storyTeams(n).forEach(t=>lk[t]=(lk[t]||0)+w);if(n.cat)lk["src:"+n.cat]=(lk["src:"+n.cat]||0)+w/2;try{localStorage.setItem(FEEDK(),JSON.stringify(lk))}catch(e){}}
+function feedList(){const lk=feedLikes(),now=Date.now();FEEDTEAMS=null;
+return ALL().filter(n=>n.t).map(n=>{let s=0;if(PREF()&&hasPick(n,""))s+=40;storyTeams(n).forEach(t=>{s+=(lk[t]||0)*6;if(isMyClub(t))s+=30});s+=(lk["src:"+n.cat]||0)*2;s-=Math.min(48,(now-(n.d||now))/36e5)*1.5;return{n,s}}).sort((a,b)=>b.s-a.s).map(x=>x.n)}
+const FEED_BG=["linear-gradient(160deg,#1b4fd8,#0b1430)","linear-gradient(160deg,#d64545,#2a0b17)","linear-gradient(160deg,#1f9d55,#06261a)","linear-gradient(160deg,#9b5cff,#1d0b3a)","linear-gradient(160deg,#e0a526,#3a2400)","linear-gradient(160deg,#0fb5c9,#062a33)"];
+const feedBg=n=>FEED_BG[[...String(n.cat||n.id)].reduce((a,c)=>a+c.charCodeAt(0),0)%FEED_BG.length];
+function openShorts(){const list=feedList();if(!list.length){toast("No stories in this section right now.");return}
+const forYou=PREF()||Object.keys(feedLikes()).length;const ov=document.createElement("div");ov.className="shorts";ov.setAttribute("role","dialog");ov.setAttribute("aria-label","News feed");
+const slide=(n,k)=>{const img=!!n.img;return`<section class="short${img?"":" noimg"}" data-k="${k}">${img?`<div class="shbg" ${bg(n.img)}></div><div class="shshade"></div>`:`<div class="shbg" style="background:${feedBg(n)}"></div>`}<div class="shtxt"><span class="shsrc">${esc(n.cat||"")}${n.d?" · "+ago(n.d):""}</span><h2>${esc(n.t)}</h2>${n.s?`<p>${esc(n.s)}</p>`:""}<div class="shbtns"><button class="btn" data-shopen="${esc(n.id)}">📖 ${L("Read story")}</button><button class="btn ghost" data-shsave="${esc(n.id)}">${isSaved(n.id)?"★":"☆"} ${L("Save")}</button>${me?`<button class="btn ghost" data-shshare="${esc(n.id)}">💬 ${L("Share")}</button>`:""}</div></div><span class="shcount">${k+1} / ${list.length}</span></section>`};
+ov.innerHTML=`<button class="shclose" aria-label="Close">✕</button><span class="shtitle">📱 ${L("Feed")}${forYou?` · ✨ ${L("For you")}`:""}</span><div class="shscroll" tabindex="-1">${list.map(slide).join("")}</div><p class="shhint">${L("Swipe up for the next story")}</p>`;
+document.body.appendChild(ov);document.body.classList.add("noscroll");const sc=ov.querySelector(".shscroll");sc.focus();
+// staying on a story for 5 seconds counts as liking it a little
+let cur=-1,dwell=0;const onScroll=()=>{const k=Math.round(sc.scrollTop/sc.clientHeight);if(k!==cur){cur=k;clearTimeout(dwell);dwell=setTimeout(()=>{if(list[cur])likeStory(list[cur],1)},5000)}};sc.addEventListener("scroll",onScroll,{passive:true});onScroll();
+const close=()=>{clearTimeout(dwell);ov.remove();document.body.classList.remove("noscroll");document.removeEventListener("keydown",key)};
 const go=d=>sc.scrollBy({top:d*sc.clientHeight,behavior:"smooth"});
 const key=e=>{if(e.key==="Escape")close();else if(e.key==="ArrowDown"||e.key==="PageDown"||e.key===" "){e.preventDefault();go(1)}else if(e.key==="ArrowUp"||e.key==="PageUp"){e.preventDefault();go(-1)}};
 document.addEventListener("keydown",key);setTimeout(()=>{const h=ov.querySelector(".shhint");if(h)h.remove()},3500);
-ov.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;e.stopPropagation();
+ov.addEventListener("click",e=>{e.stopPropagation();const t=e.target.closest("button");if(!t)return;
 if(t.classList.contains("shclose"))return close();
-if(t.dataset.shopen){close();openFrom="news";open=t.dataset.shopen;tab="news";render();scrollTo(0,0)}
-else if(t.dataset.shsave){const n=list.find(x=>x.id===t.dataset.shsave);if(n){toggleSave(n.id);t.textContent=(isSaved(n.id)?"★ ":"☆ ")+L("Save")}}
-else if(t.dataset.shshare){close();openFrom="news";open=t.dataset.shshare;tab="news";shareFor=t.dataset.shshare;render();scrollTo(0,0)}})}
+const n=list.find(x=>x.id===(t.dataset.shopen||t.dataset.shsave||t.dataset.shshare));
+if(t.dataset.shopen){likeStory(n,3);close();openFrom="news";open=t.dataset.shopen;tab="news";render();scrollTo(0,0)}
+else if(t.dataset.shsave&&n){toggleSave(n.id);if(isSaved(n.id))likeStory(n,2);t.textContent=(isSaved(n.id)?"★ ":"☆ ")+L("Save")}
+else if(t.dataset.shshare){likeStory(n,2);close();openFrom="news";open=t.dataset.shshare;tab="news";shareFor=t.dataset.shshare;render();scrollTo(0,0)}})}
 /* ---- PACK OPENING ANIMATION: the pack shakes and bursts, then the cards flip over one by one (rare ones glow) ---- */
 const RANKR={common:0,uncommon:1,rare:2,super_rare:3,epic:4,legendary:5,ultimate:6};
 function revealHtml(){const pk=PULL.pack;
@@ -1073,24 +1091,30 @@ return`<div class="packstage"><div class="bigpack r${best}"><span>${pk.e}</span>
 return`<div class="reveal flipset">${PULL.cards.map((c,i)=>{const p=GP.find(x=>x.id===c.player_id);if(!p)return"";const big=(RANKR[c.rarity]||0)>=4;
 return`<div class="flip${big?" big":""}" style="--d:${(i*.7+.15).toFixed(2)}s"><div class="flip-in"><div class="flip-back"><span>⚽</span></div><div class="flip-front">${pcard(p,COL[p.id]||1,c.is_new?'<span class="pbadge">NEW!</span>':`<span class="pbadge dup">Duplicate +${c.refund} 🪙</span>`)}${big?'<i class="spark"></i><i class="spark s2"></i><i class="spark s3"></i>':""}</div></div></div>`}).join("")}</div>`}
 
-/* ---- DREAM TEAM: pick 5 players you own. Every day each one scores (rating − 5) to (rating + 5) points, the same random number for everyone.
-   Points add up every day. A changed team counts from the next day. Worked out by Supabase (supabase-big-update.sql). ---- */
-let DT=null,DTSEL=null,DTMSG="",DTAT=0;
+/* ---- DREAM TEAM: 11 players you own, one for every position of a 4-3-3. Every day each one scores (rating − 5) to (rating + 5) points,
+   the same random number for everyone. Points add up every day. A changed team counts from the next day. Worked out by Supabase. ---- */
+// slot order matches Supabase: GK, RB, CB, CB, LB, CDM, CM, CAM, RW, ST (or CF), LW
+const DT_SLOTS=[["GK",["GK"]],["RB",["RB"]],["CB",["CB"]],["CB",["CB"]],["LB",["LB"]],["CDM",["CDM"]],["CM",["CM"]],["CAM",["CAM"]],["RW",["RW"]],["ST",["ST","CF"]],["LW",["LW"]]];
+const DT_ROWS=[[10,9,8],[6,7,5],[4,3,2,1],[0]];
+let DT=null,DTSEL=null,DTSLOT=0,DTMSG="",DTAT=0;
 async function loadDream(force){if(!SB||!me)return;if(!force&&DT&&Date.now()-DTAT<30000)return;DTAT=Date.now();const{data,error}=await SB.rpc("dream_state");
-if(error)DTMSG=/does not exist|schema cache|function/i.test(error.message)?"The dream team isn't set up in Supabase yet (run supabase-big-update.sql).":"Couldn't load your dream team. Check your connection.";else{DT=data||{};DTMSG="";if(DTSEL==null)DTSEL=(DT.next||DT.team||[]).slice()}
+if(error)DTMSG=/does not exist|schema cache|function/i.test(error.message)?"The dream team isn't set up in Supabase yet (run supabase-big-update.sql).":"Couldn't load your dream team. Check your connection.";
+else{DT=data||{};DTMSG="";if(DTSEL==null){const t=DT.next||DT.team||[];DTSEL=t.length===11?t.slice():Array(11).fill(null);DTSLOT=Math.max(0,DTSEL.findIndex(x=>!x))}}
 if(tab==="gallery"&&gsub==="dream")render()}
-async function saveDream(){if(!DTSEL||DTSEL.length!==5){DTMSG="Pick exactly 5 players.";return render()}const{data,error}=await SB.rpc("dream_save",{p_players:DTSEL});
-DTMSG=error?error.message:(DT&&DT.team?"Saved! Your new team starts scoring tomorrow.":"Saved! Your team starts scoring today.");DT=null;loadDream(true);render()}
+async function saveDream(){if(!DTSEL||DTSEL.filter(Boolean).length!==11){DTMSG="Fill all 11 positions.";return render()}const{error}=await SB.rpc("dream_save",{p_players:DTSEL});
+DTMSG=error?error.message:(DT&&DT.team&&DT.team.length===11?"Saved! Your new team starts scoring tomorrow.":"Saved! Your team starts scoring today.");DT=null;loadDream(true);render()}
+function dreamPick(id){const s=DTSEL;const old=s.indexOf(id);if(old>=0)s[old]=null;s[DTSLOT]=id;const nx=s.findIndex(x=>!x);if(nx>=0)DTSLOT=nx;DTMSG=""}
 function dreamPage(){if(!DT){loadDream();return`<p class="sl">${DTMSG?esc(L(DTMSG)):L("Loading your dream team…")}</p>`}
-const own=GP.filter(p=>COL[p.id]).sort((a,b)=>b.rating-a.rating),sel=DTSEL||[],today=new Map((DT.today||[]).map(x=>[x.id,x.pts])),team=(DT.team||[]).map(id=>GP.find(p=>p.id===id)).filter(Boolean);
-const todayTotal=[...today.values()].reduce((a,b)=>a+b,0);
-return`<div class="panel"><h3>⭐ ${L("Dream team")}</h3><p class="sl" style="margin-top:0">${L("Pick 5 players you own. Every day each one scores between (rating − 5) and (rating + 5) points, picked at random. The points add up every day. Changes count from tomorrow.")}</p>
-${team.length?`<div class="dtstats"><div class="stat"><small>📅 ${L("Points today")}</small><b>${todayTotal}</b></div><div class="stat"><small>🏆 ${L("Total points")}</small><b>${Number(DT.total||0).toLocaleString()}</b></div></div>
-<div class="pgrid dtteam">${team.map(p=>`<div class="dtcard">${pcard(p,1,`<span class="pbadge">+${today.get(p.id)??"?"}</span>`)}</div>`).join("")}</div>`:`<p class="sl">${L("You don't have a dream team yet. Pick 5 players below.")}</p>`}
-${DT.next?`<p class="sl">🔜 ${L("Your changed team starts tomorrow.")}</p>`:""}</div>
-<div class="panel"><h3>${team.length?L("Change your team"):L("Pick your team")} <small class="hint">${sel.length}/5</small></h3>
-${own.length?`<div class="pgrid">${own.map(p=>`<button class="pick${sel.includes(p.id)?" sel":""}" data-dtp="${p.id}" aria-pressed="${sel.includes(p.id)}">${pcard(p,COL[p.id])}</button>`).join("")}</div>`:`<p class="sl">${L("Open packs to get players first.")}</p>`}
-<div class="row" style="justify-content:flex-start;gap:10px;margin-top:10px"><button class="btn" data-dtsave ${sel.length===5?"":"disabled"}>💾 ${L("Save dream team")}</button>${DTMSG?`<p class="sl" role="status" style="margin:0">${esc(L(DTMSG))}</p>`:""}</div></div>
+const sel=DTSEL||Array(11).fill(null),today=new Map((DT.today||[]).map(x=>[x.id,x.pts])),team=DT.team&&DT.team.length===11?DT.team:null,todayTotal=[...today.values()].reduce((a,b)=>a+b,0),filled=sel.filter(Boolean).length;
+const gp=id=>GP.find(p=>p.id===id),short=n=>{const w=n.split(" ");return w.length>1?w[w.length-1]:n};
+const slot=i=>{const p=sel[i]&&gp(sel[i]),pos=DT_SLOTS[i][0],pts=team&&team[i]===sel[i]?today.get(sel[i]):null;return`<button class="dtslot${DTSLOT===i?" on":""}${p?" full r-"+p.rarity:""}" data-dtslot="${i}" style="${p?`--rc:${rarOf(p.rarity)[3]}`:""}"><small>${pos}</small>${p?`<b>${p.rating}</b><span>${esc(short(p.name))}</span>${pts!=null?`<i>+${pts}</i>`:""}`:`<b>+</b><span>${L("Pick")}</span>`}</button>`};
+const want=DT_SLOTS[DTSLOT][1],choices=GP.filter(p=>COL[p.id]&&want.includes(p.position)).sort((a,b)=>b.rating-a.rating);
+return`<div class="panel"><h3>⭐ ${L("Dream team")} <small class="hint">4-3-3 · ${filled}/11</small></h3><p class="sl" style="margin-top:0">${L("Pick 11 players you own, one for every position. Every day each one scores between (rating − 5) and (rating + 5) points, picked at random. The points add up every day. Changes count from tomorrow.")}</p>
+${team?`<div class="dtstats"><div class="stat"><small>📅 ${L("Points today")}</small><b>${todayTotal}</b></div><div class="stat"><small>🏆 ${L("Total points")}</small><b>${Number(DT.total||0).toLocaleString()}</b></div></div>`:""}
+<div class="dtpitch">${DT_ROWS.map(r=>`<div class="dtrow">${r.map(slot).join("")}</div>`).join("")}</div>
+${DT.next?`<p class="sl">🔜 ${L("Your changed team starts tomorrow.")}</p>`:""}
+<div class="row" style="justify-content:flex-start;gap:10px;margin-top:10px;flex-wrap:wrap"><button class="btn" data-dtsave ${filled===11?"":"disabled"}>💾 ${L("Save dream team")}</button>${DTMSG?`<p class="sl" role="status" style="margin:0">${esc(L(DTMSG))}</p>`:""}</div></div>
+<div class="panel"><h3>${L("Pick your")} ${DT_SLOTS[DTSLOT][0]} <small class="hint">${want.join(" / ")}</small></h3>${choices.length?`<div class="pgrid">${choices.map(p=>`<button class="pick${sel.includes(p.id)?" sel":""}" data-dtp="${p.id}" aria-pressed="${sel[DTSLOT]===p.id}">${pcard(p,COL[p.id])}</button>`).join("")}</div>`:`<p class="sl">${L("You don't have a player for this position yet. Open packs to find one!")}</p>`}</div>
 ${(DT.top||[]).length?`<div class="panel"><h3>🏅 ${L("Dream team leaderboard")}</h3>${DT.top.map((r,i)=>`<div class="tourrow${r.me?" me":""}"><span>${i+1}</span><b data-notr>${esc(r.name)}</b><small>${Number(r.points).toLocaleString()} pts</small></div>`).join("")}</div>`:""}`}
 /* ---- CHAMPIONS LEAGUE BRACKET (Arcade): predict the league-phase table, then pick every knockout winner up to the champion.
    Saved to your account (cl_brackets) and scored against the real results as they happen. ---- */
@@ -1991,6 +2015,13 @@ Portugal time|hora de Portugal|hora de Portugal
 in|daqui a|en
 Live sessions every day at|Sessões ao vivo todos os dias às|Sesiones en directo cada día a las
 Same session all day, a new one every day. Here's today's plan:|A mesma sessão o dia todo, uma nova todos os dias. Este é o plano de hoje:|La misma sesión todo el día, una nueva cada día. Este es el plan de hoy:
+Feed|Feed|Feed
+For you|Para si|Para ti
+Pick 11 players you own, one for every position. Every day each one scores between (rating − 5) and (rating + 5) points, picked at random. The points add up every day. Changes count from tomorrow.|Escolha 11 jogadores seus, um para cada posição. Todos os dias cada um marca entre (classificação − 5) e (classificação + 5) pontos, à sorte. Os pontos somam-se todos os dias. As mudanças contam a partir de amanhã.|Elige 11 jugadores tuyos, uno para cada posición. Cada día cada uno suma entre (valoración − 5) y (valoración + 5) puntos, al azar. Los puntos se suman cada día. Los cambios cuentan desde mañana.
+Fill all 11 positions.|Preencha as 11 posições.|Completa las 11 posiciones.
+Pick|Escolher|Elegir
+Pick your|Escolha o seu|Elige tu
+You don't have a player for this position yet. Open packs to find one!|Ainda não tem um jogador para esta posição. Abra pacotes para encontrar um!|Todavía no tienes un jugador para esta posición. ¡Abre sobres para encontrar uno!
 Admins|Admins|Admins`;
 TRX.split("\n").forEach(l=>{const p=l.split("|");if(p.length===3)DICT[p[0]]=[p[1],p[2]]});
 // Phrases with numbers or times in them
@@ -2303,7 +2334,7 @@ if(d.t){if(d.t==="friends"&&tab!=="friends")FD.loaded=false;tab=d.t;open=null;$(
 else if(d.fs){fsub=d.fs;unfAsk=null;if(d.fs!=="profile")fView=null;if(d.fs==="feed")loadFriends()}else if(d.fview){fView=d.fview;fsub="profile";unfAsk=null;delete FD.prof[d.fview]}else if(d.trade){trSel={to:d.trade,give:[],get:[]};trMsg="";fsub="trade"}else if(d.tg){const i=+d.tg,a=trSel.give;trSel.give=a.includes(i)?a.filter(x=>x!==i):a.length<5?[...a,i]:a;trMsg=""}else if(d.tw){const i=+d.tw,a=trSel.get;trSel.get=a.includes(i)?a.filter(x=>x!==i):a.length<5?[...a,i]:a;trMsg=""}else if(d.tsend!==undefined){sendTrade();return}else if(d.tacc){answerTrade(d.tacc,true);return}else if(d.tdec){answerTrade(d.tdec,false);return}else if(d.tcan){cancelTrade(d.tcan);return}else if(d.newg!==undefined){NEWG={name:"",sel:[],msg:""}}else if(d.gpick){NEWG.name=($("#gname")||{}).value||NEWG.name;NEWG.sel=NEWG.sel.includes(d.gpick)?NEWG.sel.filter(x=>x!==d.gpick):[...NEWG.sel,d.gpick];NEWG.msg=""}else if(d.gcreate!==undefined){createGroup();return}else if(d.gcancel!==undefined){NEWG=null}else if(d.leaveg){LEAVEASK=LEAVEASK===+d.leaveg?null:+d.leaveg}else if(d.leavegyes){leaveGroup(+d.leavegyes);return}else if(d.fmlg){fmLg=d.fmlg}else if(d.gadev){gaDev=d.gadev}else if(d.lbk){LBK=d.lbk;lbRender();return}else if(d.tk){TK=d.tk;TOUR=null;TOURERR="";loadTour(true)}
 else if(d.fun){const[a1,a2]=d.fun.split(":");funDo(a1,a2);return}else if(d.trpick!==undefined){t.classList.toggle("on");return}
 else if(d.shorts!==undefined){openShorts();return}
-else if(d.dtp){const i=+d.dtp;DTSEL=DTSEL||[];DTSEL=DTSEL.includes(i)?DTSEL.filter(x=>x!==i):DTSEL.length<5?[...DTSEL,i]:DTSEL;DTMSG=""}else if(d.dtsave!==undefined){saveDream();return}
+else if(d.dtp){dreamPick(+d.dtp)}else if(d.dtslot!==undefined){DTSLOT=+d.dtslot}else if(d.dtsave!==undefined){saveDream();return}
 else if(d.clbst){CLB.step=d.clbst;clbClean();clbRender();return}
 else if(d.clbsel!==undefined){const i=+d.clbsel;if(CLBSEL==null)CLBSEL=i;else{const r=CLB.ranking;[r[i],r[CLBSEL]]=[r[CLBSEL],r[i]];CLBSEL=null;clbClean();clbSave()}clbRender();return}
 else if(d.clbmv){const[i,dir]=d.clbmv.split(":").map(Number),r=CLB.ranking,j=i+dir;if(j>=0&&j<r.length){[r[i],r[j]]=[r[j],r[i]];CLBSEL=null;clbClean();clbSave()}clbRender();return}
