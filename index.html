@@ -215,6 +215,11 @@ tr.z1 td:first-child{box-shadow:inset 4px 0 0 #1f9d55}tr.z2 td:first-child{box-s
 .livedot{font-weight:900;animation:evpulse 1.4s infinite}.livet{margin-left:auto;font-size:26px;font-weight:900;font-variant-numeric:tabular-nums}.drill.now{border-color:#d64545;box-shadow:0 0 0 2px #d6454555}.drill.next{opacity:.75}.dhead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}.dhead small{color:var(--mute)}
 /* pack buttons: green when you can afford it, grey with a lock when you can't (the same in every style) */
 .btn.packbtn.can{background:#1f9d55!important;color:#fff!important;border:0!important;box-shadow:0 0 14px #1f9d5588!important;animation:none!important;text-shadow:none!important;font-weight:800}.btn.packbtn.cant{background:#ffffff12!important;color:var(--mute)!important;border:1.5px solid var(--line)!important;box-shadow:none!important;animation:none!important;text-shadow:none!important}
+#warnbox{position:fixed;inset:0;z-index:300;background:#000000d0;backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px}#warnbox[hidden]{display:none}
+.noticecard{max-width:520px;width:100%;background:linear-gradient(160deg,#16244a,#0b1430);border:1.5px solid var(--line);border-radius:24px;padding:30px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 20px 60px #000a;animation:noticein .35s ease-out}
+@keyframes noticein{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}.nicon{font-size:64px;line-height:1}.noticecard h2{font-size:clamp(24px,5vw,34px);margin:0;line-height:1.15}
+.nreason{width:100%;background:#ffffff10;border:1px solid var(--line);border-radius:16px;padding:12px 16px;text-align:left}.nreason small{display:block;color:var(--mute);font-weight:800;text-transform:uppercase;letter-spacing:1px;font-size:12px}.nreason p{margin:4px 0 0;font-size:17px}
+.btn.nok{min-width:180px;font-size:18px;padding:12px 26px}
 .kb{display:flex;flex-direction:column;gap:6px;margin-top:8px}.kbr{display:flex;gap:4px;justify-content:center}.kk{flex:1;max-width:40px;height:46px;padding:0;border-radius:8px;border:1.5px solid var(--line);background:#ffffff14;color:inherit;font-weight:800;font-size:15px}.kk.wide{max-width:64px;flex:1.6;font-size:12px}
 .kk.g{background:#1f9d55;border-color:#1f9d55;color:#fff}.kk.y{background:#c9a227;border-color:#c9a227;color:#fff}.kk.x{background:#3a4258;border-color:#3a4258;color:#ffffff88}
 .wmsg{min-height:20px;margin:4px 0 0;text-align:center;font-weight:700;color:#ff8a8c}.shake{animation:shake .4s}@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
@@ -604,7 +609,7 @@ const initK="rf_seeninit_"+PK(),firstRun=(()=>{try{return!localStorage.getItem(i
 r.data.forEach(m=>{if(!validRoom(m.room))return;if(m.room.startsWith("af:"))AFACT.add(m.room);if(done.has(m.room))return;done.add(m.room);if(m.room.startsWith("g:")&&GROUPS&&!groupOf(m.room))loadGroups(true);
 if(!seenAt(m.room)&&firstRun){markSeen(m.room,m.created_at);return}/* the very first time, older messages count as read */
 if((!seenAt(m.room)||newerThanSeen(m.room,m.created_at))&&!(tab==="chat"&&room===m.room))UNREAD.add(m.room)});try{localStorage.setItem(initK,"1")}catch(e){}updateChatDot();if(tab==="chat"&&AFACT.size!==af0&&!(($("#msgin")||{}).value))render()}
-function startInbox(){if(!(SB&&me)||inboxCh)return;checkAdmin();loadSafety();LOGIN_NOTE="";inboxCh=SB.channel("rf-inbox").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},p=>{const m=p.new;if(!me||!m.room||m.user_id===me.id)return;if(!validRoom(m.room))return;if(m.room.startsWith("af:")&&!AFACT.has(m.room)){AFACT.add(m.room);if(tab==="chat"&&!(($("#msgin")||{}).value))render()}if(m.room.startsWith("g:")&&!groupOf(m.room))loadGroups(true);if(tab==="chat"&&room===m.room){markSeen(m.room,m.created_at)}else{UNREAD.add(m.room);updateChatDot()}}).on("postgres_changes",{event:"INSERT",schema:"public",table:"friendships"},p=>{if(me&&p.new.friend_id===me.id)checkRequests()}).on("postgres_changes",{event:"*",schema:"public",table:"trades"},()=>loadTrades()).subscribe();loadTrades();checkRequests().then(()=>loadGroups(true)).then(checkUnread);clearInterval(reqT);reqT=setInterval(checkRequests,120000)}
+function startInbox(){if(!(SB&&me)||inboxCh)return;checkAdmin();loadSafety();loadNotices();LOGIN_NOTE="";inboxCh=SB.channel("rf-inbox").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},p=>{const m=p.new;if(!me||!m.room||m.user_id===me.id)return;if(!validRoom(m.room))return;if(m.room.startsWith("af:")&&!AFACT.has(m.room)){AFACT.add(m.room);if(tab==="chat"&&!(($("#msgin")||{}).value))render()}if(m.room.startsWith("g:")&&!groupOf(m.room))loadGroups(true);if(tab==="chat"&&room===m.room){markSeen(m.room,m.created_at)}else{UNREAD.add(m.room);updateChatDot()}}).on("postgres_changes",{event:"INSERT",schema:"public",table:"friendships"},p=>{if(me&&p.new.friend_id===me.id)checkRequests()}).on("postgres_changes",{event:"*",schema:"public",table:"trades"},()=>loadTrades()).subscribe();loadTrades();checkRequests().then(()=>loadGroups(true)).then(checkUnread);clearInterval(reqT);reqT=setInterval(checkRequests,120000)}
 /* ---- FRIEND REQUESTS: red dot on the Friends tab when someone adds you and you haven't looked yet ---- */
 let REQ_IDS=[],REQ_NEW=0,reqT=0,MUT=null,MINE=[];
 // "Add friend" next to someone's name in chat: Add friend / Request sent / Accept (they already added you) / nothing if already friends
@@ -640,7 +645,7 @@ MINE=mine;REQ_IDS=r.data.filter(x=>x.friend_id===me.id&&!mine.includes(x.user_id
 if(tab==="friends"&&FD.loaded&&REQ_IDS.some(id=>!FD.fol.includes(id))){FD.loaded=false;render()}else updateFriendsDot()}/* a new request arrived while you look at Friends: refresh it */
 function markRequestsSeen(ids){try{localStorage.setItem(reqSeenKey(),JSON.stringify([...new Set([...reqSeen(),...ids])].slice(-200)))}catch(e){}REQ_NEW=0;updateFriendsDot()}
 function updateFriendsDot(){const b=$(".bar nav [data-t=friends]"),inc=incomingTrades().length;if(b){b.classList.toggle("hasdot",REQ_NEW>0||inc>0);b.setAttribute("aria-label",REQ_NEW?"Friends, new friend request":inc?"Friends, new trade offer":"Friends")}const tc=$('[data-fs="trades"]');if(tc)tc.classList.toggle("hasdot",inc>0);const c=$('[data-fs="list"]');if(c)c.classList.toggle("hasdot",REQ_NEW>0);syncBar()}
-function stopInbox(){ADMIN=false;ADMIN_IDS=new Set();MYR=null;BLOCKED=new Set();WARN=[];AD={};ACTX={};showWarning();applySite();if(inboxCh&&SB)SB.removeChannel(inboxCh);inboxCh=null;UNREAD.clear();updateChatDot();clearInterval(reqT);REQ_IDS=[];REQ_NEW=0;MUT=null;GROUPS=null;AFACT=new Set();NEWG=null;LEAVEASK=null;room="";TR=[];TRL=false;trSel=null;updateFriendsDot()}
+function stopInbox(){ADMIN=false;ADMIN_IDS=new Set();MYR=null;BLOCKED=new Set();WARN=[];NOTICES=[];AD={};ACTX={};showWarning();applySite();if(inboxCh&&SB)SB.removeChannel(inboxCh);inboxCh=null;UNREAD.clear();updateChatDot();clearInterval(reqT);REQ_IDS=[];REQ_NEW=0;MUT=null;GROUPS=null;AFACT=new Set();NEWG=null;LEAVEASK=null;room="";TR=[];TRL=false;trSel=null;updateFriendsDot()}
 function chatPage(){const h=`<h2 style="font-size:40px;margin-bottom:6px">${L("Chat")}</h2>`;if(!me)return h+'<div class="plan"><p>Sign in to message your friends.</p><button class="btn" data-t="account">Sign in</button></div>';
 if(SB)loadGroups();const fr=chatFriends(),list=allChats();
 if(!room||!(list.some(x=>x[0]===room)||ROOMS.some(x=>x[0]===room)||(room.startsWith("g:")&&!GROUPS)))room=(list[0]||ROOMS[0])[0];
@@ -2097,13 +2102,22 @@ if they win the final|se ganharem a final|si ganan la final
 Most picked champions|Campeões mais escolhidos|Campeones más elegidos
 fans|adeptos|aficionados
 Your champion is worth the % of fans who picked them ×|O seu campeão vale a % de adeptos que o escolheram ×|Tu campeón vale el % de aficionados que lo eligieron ×
+A warning from the admins|Um aviso dos admins|Un aviso de los administradores
+No reason was given.|Não foi dado nenhum motivo.|No se dio ningún motivo.
+Your Arcade scores were reset|As suas pontuações da Arcada foram apagadas|Tus puntuaciones del Arcade se han reiniciado
+One of your chat messages was deleted|Uma das suas mensagens do chat foi apagada|Uno de tus mensajes del chat fue eliminado
+You were banned from chat|Foi banido do chat|Te han bloqueado en el chat
+Your account was banned|A sua conta foi banida|Tu cuenta fue bloqueada
+Your restrictions were lifted|As suas restrições foram retiradas|Tus restricciones se han retirado
 Admins|Admins|Admins`;
 TRX.split("\n").forEach(l=>{const p=l.split("|");if(p.length===3)DICT[p[0]]=[p[1],p[2]]});
 // Phrases with numbers or times in them
 const WD_={Mon:["Seg","Lun"],Tue:["Ter","Mar"],Wed:["Qua","Mié"],Thu:["Qui","Jue"],Fri:["Sex","Vie"],Sat:["Sáb","Sáb"],Sun:["Dom","Dom"]},MO_={Jan:["jan","ene"],Feb:["fev","feb"],Mar:["mar","mar"],Apr:["abr","abr"],May:["mai","may"],Jun:["jun","jun"],Jul:["jul","jul"],Aug:["ago","ago"],Sep:["set","sep"],Oct:["out","oct"],Nov:["nov","nov"],Dec:["dez","dic"]};
 const LI=()=>ST.lang==="pt"?0:1,pk2=(p,e)=>[p,e][LI()];
 const AGO=(n,u)=>{const U={min:["min","min"],h:["h","h"],d:["d","d"]}[u][LI()];return pk2(`há ${n} ${U}`,`hace ${n} ${U}`)};
-const PATS=[ [/^\u{1F465} (.+)'s friends$/u,(m,a)=>"\u{1F465} "+pk2("Amigos de ","Amigos de ")+a],
+const PATS=[ [/^You lost (\d+) coins$/,(m,n)=>pk2(`Perdeu ${n} moedas`,`Perdiste ${n} monedas`)],[/^You got (\d+) coins$/,(m,n)=>pk2(`Recebeu ${n} moedas`,`Recibiste ${n} monedas`)],
+ [/^You were muted in chat for (.+) (minutes|hours)$/,(m,a,u)=>pk2(`Foi silenciado no chat durante ${a} ${u==="hours"?"horas":"minutos"}`,`Te silenciaron en el chat durante ${a} ${u==="hours"?"horas":"minutos"}`)],
+ [/^Your account was suspended until (.+)$/,(m,a)=>pk2("A sua conta foi suspensa até "+a,"Tu cuenta fue suspendida hasta "+a)], [/^\u{1F465} (.+)'s friends$/u,(m,a)=>"\u{1F465} "+pk2("Amigos de ","Amigos de ")+a],
  [/^(.*) · (\d+) (min|h|d) ago$/,(m,a,n,u)=>a+" · "+AGO(n,u)],
  [/^(\d+) (min|h|d) ago$/,(m,n,u)=>AGO(n,u)],
  [/^just now$/,()=>pk2("agora mesmo","ahora mismo")],
@@ -2305,7 +2319,14 @@ async function loadSafety(){if(!(SB&&me))return;try{const[r,b,w]=await Promise.a
 const x=r.data;MYR=x&&(x.status==="banned"||x.status==="banned_all"||new Date(x.until)>Date.now())?x:null;BLOCKED=new Set((b.data||[]).map(y=>y.blocked_id));WARN=w.data||[];
 if(MYR&&(MYR.status==="banned_all"||MYR.status==="suspended")){LOGIN_NOTE=restrictText(MYR)+(MYR.reason?" Reason: "+MYR.reason:"");stopInbox();me=null;saved=[];SB.auth.signOut();render();return}
 showWarning();if(tab==="chat")render()}catch(e){}}
-function showWarning(){const box=$("#warnbox");if(!box)return;const w=WARN[0];box.hidden=!w;if(w)box.innerHTML=`<div class="warncard" role="alertdialog" aria-labelledby="warnh"><h3 id="warnh">⚠️ A message from The Footballer admins</h3><p>${esc(w.message)}</p><small class="sl">${new Date(w.created_at).toLocaleString("en-GB")}</small><button class="btn" data-ackw="${w.id}">I understand</button></div>`}
+/* ---- ADMIN NOTICES: when an admin does something to you (coins, scores, a deleted message, a mute or ban, a warning),
+   a full-screen message shows what happened, the reason, and an OK button. From supabase-admin-notices.sql. ---- */
+let NOTICES=[];
+async function loadNotices(){if(!(SB&&me))return;const{data,error}=await SB.from("admin_notices").select("id,icon,title,reason,created_at").is("seen_at",null).order("created_at").limit(20);if(!error){NOTICES=data||[];showWarning()}}
+setInterval(()=>{if(me&&SB&&!document.hidden)loadNotices()},60000);
+function showWarning(){const box=$("#warnbox");if(!box)return;const n=NOTICES[0],w=WARN[0];box.hidden=!(n||w);if(!n&&!w)return;
+const it=n?{icon:n.icon||"📣",title:n.title,reason:n.reason,when:n.created_at,btn:`data-acknotice="${n.id}"`}:{icon:"⚠️",title:"A warning from the admins",reason:w.message,when:w.created_at,btn:`data-ackw="${w.id}"`};
+box.innerHTML=`<div class="noticecard" role="alertdialog" aria-labelledby="noticeh"><div class="nicon">${esc(it.icon)}</div><h2 id="noticeh">${esc(it.title)}</h2><div class="nreason">${it.reason?`<small>${L("Reason")}</small><p>${esc(it.reason)}</p>`:`<p class="sl" style="margin:0">${L("No reason was given.")}</p>`}</div><small class="sl">${new Date(it.when).toLocaleString(ST.lang==="pt"?"pt-PT":ST.lang==="es"?"es-ES":"en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</small><button class="btn nok" ${it.btn}>OK</button></div>`;setTimeout(()=>{const b=box.querySelector(".nok");if(b)b.focus()},50)}
 const isMuted=u=>!!(me&&(me.muted||[]).includes(u));
 function msgMenu(m){if(REPFOR===m.i)return`<div class="mmenu"><small>Why are you reporting this?</small>${[["abuse","Abuse"],["harassment","Bullying"],["hate","Hate"],["threat","Threat"],["spam","Spam"],["personal_info","Personal info"],["other","Other"]].map(([k,l])=>`<button class="chip" data-rep="${m.i}|${k}">${l}</button>`).join("")}<button class="back" data-mact="${m.i}">Cancel</button></div>`;
 return`<div class="mmenu"><button class="chip" data-repopen="${m.i}">🚩 Report</button><button class="chip" data-mute="${esc(m.u)}">${isMuted(m.u)?"🔊 Unmute":"🔇 Mute"}</button><button class="chip" data-block="${esc(m.u)}">${BLOCKED.has(m.u)?"✅ Unblock":"⛔ Block"}</button></div>`}
@@ -2415,7 +2436,7 @@ else if(d.clbsel!==undefined){const i=+d.clbsel;if(CLBSEL==null)CLBSEL=i;else if
 else if(d.clbmv){const[i,dir]=d.clbmv.split(":").map(Number),r=CLB.ranking,j=i+dir;if(j>=0&&j<r.length){[r[i],r[j]]=[r[j],r[i]];CLBSEL=null;clbClean();clbSave()}clbRender();return}
 else if(d.clbpk){const[stp,i,...tm]=d.clbpk.split(":");CLB.picks[stp]=CLB.picks[stp]||[];CLB.picks[stp][+i]=tm.join(":");clbClean();clbSave();clbRender();return}
 else if(d.hl){hlGuess(+d.hl);return}else if(d.sfx!==undefined){SFX=!SFX;try{localStorage.setItem("rf_sfx",SFX?"1":"0")}catch(e){}t.textContent=SFX?"🔊":"🔇";return}
-else if(d.trs){trsub=d.trs}else if(d.tg2){const[k2,v2]=d.tg2.split(":");TG[k2]=k2==="f"?v2:+v2}else if(d.tggo!==undefined){TGOUT=genSession()}else if(d.tgshuffle!==undefined){TG.seed++;TGOUT=genSession()}else if(d.chatadd){chatAdd(d.chatadd,d.name);return}
+else if(d.trs){trsub=d.trs}else if(d.tg2){const[k2,v2]=d.tg2.split(":");TG[k2]=k2==="f"?v2:+v2}else if(d.tggo!==undefined){TGOUT=genSession()}else if(d.tgshuffle!==undefined){TG.seed++;TGOUT=genSession()}else if(d.acknotice){SB.rpc("ack_notice",{p_id:+d.acknotice}).then(()=>{},()=>{});NOTICES.shift();showWarning();return}else if(d.chatadd){chatAdd(d.chatadd,d.name);return}
 else if(d.mact){MACT=MACT===+d.mact?null:+d.mact;REPFOR=null;drawThread(true);return}else if(d.repopen){REPFOR=+d.repopen;drawThread(true);return}else if(d.rep){const[i,k]=d.rep.split("|");reportMsg(i,k);return}else if(d.mute){toggleMute(d.mute);return}else if(d.block){toggleBlock(d.block);return}
 else if(d.ackw){SB.rpc("ack_warning",{p_id:+d.ackw}).then(()=>{},()=>{});WARN.shift();showWarning();return}
 else if(d.as){asub=d.as;ACONF=null;aMsg="";AD[asub]=undefined}else if(d.aref!==undefined){AD[asub]=undefined;aMsg=""}else if(d.arf){repFilter=d.arf;AD.reports=undefined}else if(d.aroom){aRoom=d.aroom;AD.chat=undefined}
