@@ -953,7 +953,7 @@ else if(k==="react"){goal();if(!g.over){if(rc.ph==="wait"){rc.wait--;rc.kx+=(160
 else if(rc.ph==="shot"){if(g.t-rc.t0>=rc.D){rc.res="GOAL! Too slow";shake=6;rc.ph="res";rc.f=0}}
 else if(rc.ph==="res"){rc.f++;if(rc.f>55){rc.i++;if(rc.i>=10)end();else{rc.ph="wait";rc.wait=40+Math.random()*90|0;rc.res=""}}}}
 if(rc.ph==="shot"||(rc.ph==="res"&&rc.res.startsWith("GOAL"))){const u=rc.ph==="shot"?Math.min(1,(g.t-rc.t0)/rc.D):1;ball(160+(rc.tx-160)*u,380+(rc.ty-380)*u,12-u*4)}
-keeperFig(rc.kx,rc.ky-12);x.strokeStyle="#ffe06690";x.lineWidth=2;x.beginPath();x.arc(rc.kx,rc.ky,34,0,7);x.stroke();
+keeperFig(rc.kx,rc.ky-12);
 if(rc.ph==="wait"&&!g.over)txt("Get ready…",W/2,270,26);txt(rc.res,W/2,240,22,rc.res.startsWith("Saved")?"#5ad1ff":"#fff");txt("Score "+g.score+"   Shot "+Math.min(rc.i+1,10)+"/10",W/2,H-14,18);if(g.over)txt("Final "+g.score+". Tap to retry",W/2,310,20)}
 else if(k==="pass"){if(!ps.mates.length&&!ps.anim)passSpawn();
 if(!g.over){ps.opp.forEach(o=>{o.x+=o.vx;o.y+=o.vy;if(o.x<20||o.x>W-20)o.vx*=-1;if(o.y<40||o.y>H-90)o.vy*=-1});if(ps.anim){ps.anim.f++;if(ps.anim.f>=18){ps.me={x:ps.anim.to.x,y:ps.anim.to.y};ps.anim=null;passSpawn()}}}
@@ -1063,7 +1063,7 @@ const sym={gold:["✨","🪙","⭐","✨"],neon:["●","◆","●","■"],retro:
 fx.innerHTML=Array.from({length:22},(_,i)=>`<span class="evp" style="left:${(Math.random()*100).toFixed(1)}%;--s:${(10+Math.random()*16).toFixed(0)}px;--t:${(7+Math.random()*9).toFixed(1)}s;--dl:-${(Math.random()*12).toFixed(1)}s">${sym[i%sym.length]}</span>`).join("");document.body.appendChild(fx);
 if(th==="retro"&&!$("#retrofont")){const l=document.createElement("link");l.id="retrofont";l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap";document.head.appendChild(l)}}
 const STYLE_NAMES={gold:"🥇 Gold style",neon:"💜 Neon style",retro:"👾 Retro style",winter:"❄️ Winter style"};
-function applyEvents(){const R=document.documentElement;const manual=((SITE&&SITE.events)||{});R.dataset.ev=evOn("theme")?(manual.theme&&new Date(manual.theme)>new Date()?manual.theme_name:abuseTheme())||"":"";
+function applyEvents(){const R=document.documentElement;const manual=((SITE&&SITE.events)||{});R.dataset.ev=evOn("theme")?(manual.theme&&new Date(manual.theme)>new Date()?manual.theme_name||abuseTheme():abuseTheme())||"":"";
 evFx(R.dataset.ev);let bar=$("#evbar");if(!bar){bar=document.createElement("div");bar.id="evbar";bar.setAttribute("role","status");const a=$("#announce");(a||$("main")).before(bar)}
 const on=[["double_coins","🪙","Double coins"],["double_points","⭐","Double points"],["half_packs","🏷️","Half-price packs"]].filter(e=>evOn(e[0]));
 bar.innerHTML=(on.length||R.dataset.ev?`<span class="abuse">🔥 ${L("ADMIN ABUSE!")}</span>`:"")+on.map(e=>`<span>${e[1]} <b>${L(e[2])}</b> ${L("until")} ${evUntil(e[0])}</span>`).join("")+(R.dataset.ev?`<span><b>${L(STYLE_NAMES[R.dataset.ev]||"")}</b></span>`:"");bar.hidden=(!on.length&&!R.dataset.ev)||!me}
