@@ -2546,7 +2546,7 @@ const PACKS=[{id:"basic",n:"Basic pack",e:"📦",price:100,w:{common:60,uncommon
 {id:"epic",n:"Epic pack",e:"🔥",price:750,w:{super_rare:40,epic:45,legendary:13,ultimate:2},d:"3 players, all Super Rare or better."},
 {id:"legendary",n:"Legendary pack",e:"👑",price:2000,w:{epic:45,legendary:45,ultimate:10},d:"3 players, all Epic or better."},
 {id:"rising",n:"Rising Stars pack",e:"🌟",price:400,w:GEN_ODDS,d:"3 of the best players aged 21 and under."},
-{id:"icons",n:"Icons pack",e:"🐐",price:1500,w:GEN_ODDS,club:"Icon",d:"3 football legends: Pelé, Maradona, Zidane, Ronaldo and more."},
+{id:"icons",n:"Icons pack",e:"🐐",price:3000,w:{rare:3,super_rare:7,epic:25,legendary:40,ultimate:25},club:"Icon",d:"3 football legends: Pelé, Maradona, Zidane, Ronaldo and more. Mostly Legendary and Ultimate!"},
 ...["Real Madrid","Barcelona","Manchester City","Liverpool","Bayern Munich"].map(c=>({id:"club:"+c,n:c+" pack",e:"🛡️",price:500,w:GEN_ODDS,club:c,d:"3 players, all from "+c+"."}))];
 let GP=[],COL={},WAL=null,gsub="col",gfil="all",PULL=null,gMsg="",gBusy=false,gTried=false;
 const toast=t=>{const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2800)};
