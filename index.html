@@ -328,6 +328,8 @@ nav button,.rooms button,.sub .chip{position:relative}.hasdot::after{content:"";
 .pc-hid{--rc:#3a4258;background:repeating-linear-gradient(45deg,#121a2c,#121a2c 10px,#172036 10px,#172036 20px);justify-content:center;box-shadow:none}.pc-q{font:800 60px Outfit,sans-serif;opacity:.45;line-height:1}.pc-hid .pc-name{opacity:.45;margin-top:6px}
 .packs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}.pk{margin:0;display:flex;flex-direction:column}.pk-e{font-size:40px}.pk .btn{margin-top:auto}
 .odds{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--mute);margin-bottom:12px}.odds b{color:var(--ink)}
+#poolbox{position:fixed;inset:0;z-index:300;background:#000c;display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}.poolcard{background:#0d1630;border:1px solid var(--line);border-radius:20px;padding:18px;max-width:1000px;width:100%}.notown{filter:grayscale(1) brightness(.55)}.poolbtn{display:block;margin:0 auto 8px}
+.reveal.many{gap:10px}.reveal.many .pc{width:118px}.pkn{display:flex;gap:6px;justify-content:center;margin:0 0 8px}.pkn .chip{padding:4px 10px;font-size:13px}
 .reveal{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:18px 0}.reveal .pc{width:160px;animation:flipin .7s both}.reveal .r-ultimate{animation:flipin .7s both,ult 2.2s ease-in-out .7s infinite}
 @keyframes flipin{from{transform:perspective(600px) rotateY(90deg) scale(.85);opacity:0}to{transform:none;opacity:1}}
 .pbadge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#3ddc84;color:#06210f;font-size:11px;font-weight:800;padding:2px 9px;border-radius:99px;white-space:nowrap}.pbadge.dup{background:#ffd23f;color:#2a2000}
@@ -348,6 +350,75 @@ nav button,.rooms button,.sub .chip{position:relative}.hasdot::after{content:"";
 .prr input{width:100%;padding:6px 4px;border-radius:10px;border:1.5px solid var(--line);background:#0003;color:var(--ink);font:600 16px Outfit,sans-serif;text-align:center}
 
 @media(min-width:761px){.bar{max-width:min(1400px,100%)}.bar nav{flex-wrap:wrap;justify-content:flex-end;row-gap:4px;overflow:visible}}
+/* ===== PHONE LAYOUT (screens up to 600px wide): tighter spacing, one-line headers, swipeable menus, big readable cards ===== */
+@media(max-width:600px){
+  /* header: logo shrinks to fit, season label sits under it */
+  .bar{padding:8px 12px;gap:4px}
+  .logo{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px 6px;font-size:17px;letter-spacing:1.5px;max-width:100%;text-align:center}
+  .logo svg{width:26px;height:26px}
+  .seasonpill{flex-basis:auto;margin:0!important;font-size:10px!important;padding:2px 8px!important}
+  /* page */
+  main{padding:12px 12px calc(96px + env(safe-area-inset-bottom,0px))}
+  h1[style*="font-size:40px"],h2[style*="font-size:40px"]{font-size:28px!important;margin:4px 0 10px!important}
+  .panel{padding:14px;border-radius:18px;margin-bottom:12px}
+  .plan{padding:16px}
+  .announce,#updbar,#evbar{width:calc(100% - 24px)!important;font-size:13px;padding:8px 12px}
+  /* menus become one swipeable line instead of wrapping into 3 rows */
+  .sub,.chips:not(.drdays){flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-12px;padding-right:12px;padding-bottom:4px}
+  .sub::-webkit-scrollbar,.chips::-webkit-scrollbar{display:none}
+  .sub .chip,.chips .chip{flex:none;white-space:nowrap;padding:7px 14px;font-size:13px}
+  /* gallery top */
+  .dailybox{padding:10px 12px;gap:8px}
+  .drdays i{font-size:10px}
+  .gtop{gap:8px}
+  .coins{font-size:15px;padding:5px 12px}
+  /* packs: compact cards side by side info */
+  .packs{grid-template-columns:1fr;gap:10px}
+  .pk{display:grid;grid-template-columns:52px 1fr;column-gap:12px;align-items:start}
+  .pk>*{grid-column:2}
+  .pk .pk-e{grid-column:1;grid-row:1 / span 3;font-size:40px;line-height:1.1}
+  .pk h3{margin:2px 0 0;font-size:18px}
+  .pk .odds{font-size:11px;margin-bottom:8px}
+  .pk .pkn,.pk .btn,.pk .poolbtn{grid-column:1 / -1}
+  .pk .btn{width:100%;padding:12px}
+  .pkn{justify-content:stretch}.pkn .chip{flex:1;padding:6px 0}
+  /* pack opening: proper card size (2 per row; 3 per row when you open lots) */
+  .reveal{gap:10px;margin:12px 0}
+  .reveal .flip{width:calc(50% - 10px);max-width:180px;margin:0}
+  .reveal .pc,.reveal.many .pc{width:100%!important}
+  .reveal.many .flip{width:calc(33.33% - 8px)}
+  .reveal.many .pc{font-size:11px;padding:8px 5px}
+  .bigpack{transform:scale(.85)}
+  /* card grids: 2 big cards per row */
+  .pgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .pc{padding:9px 6px}
+  /* arcade */
+  .arc{flex-direction:column;gap:12px;align-items:center}
+  .arc>div{width:100%}
+  canvas#cv{width:min(100%,380px)}
+  .brd{width:100%!important;padding:14px}
+  /* pop-ups fit the screen */
+  #chestbox,#poolbox{padding:10px}
+  .chestcard,.poolcard{padding:16px;border-radius:18px}
+  .chest{font-size:68px}
+  .chestitems{grid-template-columns:repeat(3,1fr)}
+  .noticecard{padding:20px 16px}
+  /* friends / chat / tables */
+  .frow{gap:8px;flex-wrap:wrap}
+  .frow .btn{padding:8px 12px;font-size:13px}
+  .fcode b{font-size:22px}
+  .thread{height:calc(100vh - 330px);min-height:260px}
+  .panel table{font-size:13px}
+  .derbygrid{grid-template-columns:1fr}
+  .derbych{gap:10px}
+  .derbych .pc{width:120px;flex:none}
+  .evrow{flex-wrap:wrap}
+  .btn{min-height:40px}
+}
+@media(max-width:380px){
+  .logo{font-size:15px;letter-spacing:1px}
+  .reveal.many .flip{width:calc(50% - 10px)}
+}
 </style></head><body>
 <header><div class="bar"><div class="logo"><svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ad1ff"/><stop offset="1" stop-color="#1b4fd8"/></linearGradient></defs><path d="M20 2 36 8v12c0 9-7 15-16 18C11 35 4 29 4 20V8z" fill="url(#lg)"/><circle cx="20" cy="20" r="9" fill="#fff"/><path d="M20 14.5l4.5 3.3-1.7 5.3h-5.6l-1.7-5.3z" fill="#0a1020"/><path d="M20 11v3.5M24.5 17.8l3.3-1.2M22.8 23.1l2 2.8M17.2 23.1l-2 2.8M15.5 17.8l-3.3-1.2" stroke="#0a1020" stroke-width="1.4" stroke-linecap="round"/></svg><span>THE</span><b>FOOTBALLER</b><span class="seasonpill" id="seasonpill">Chapter 1 · Season 1</span></div>
 <nav role="tablist"><button role="tab" data-t="news" aria-selected="true">&#x1F4F0; News</button><button role="tab" data-t="matches" aria-selected="false">&#x26BD; Matches</button><button role="tab" data-t="tables" aria-selected="false">&#x1F4CA; Tables</button><button role="tab" data-t="form" aria-selected="false">&#x1F525; Form</button><button role="tab" data-t="chat" aria-selected="false">&#x1F4AC; Chat</button><button role="tab" data-t="friends" aria-selected="false">&#x1F465; Friends</button><button role="tab" data-t="learn" aria-selected="false">&#x1F393; Tutorials</button><button role="tab" data-t="arcade" aria-selected="false">&#x1F3AE; Arcade</button><button role="tab" data-t="tournament" aria-selected="false">&#x1F3C6; Tournament</button><button role="tab" data-t="gallery" aria-selected="false">&#x1F0CF; Gallery</button><button role="tab" data-t="derby" aria-selected="false">🔥 Derby Fever</button><button role="tab" data-t="saved" aria-selected="false">&#x2B50; Saved</button><button role="tab" data-t="getapp" aria-selected="false">&#x1F4F2; Get the app</button><button role="tab" data-t="account" aria-selected="false">Sign in</button><button role="tab" data-t="admin" aria-selected="false" class="adminnav" hidden>🛡️ Admin</button></nav></div></header>
@@ -1222,9 +1293,9 @@ const RANKR={common:0,uncommon:1,rare:2,super_rare:3,epic:4,legendary:5,ultimate
 function revealHtml(){const pk=PULL.pack;
 if(PULL.stage==="pack"){setTimeout(()=>{if(PULL&&PULL.stage==="pack"){PULL.stage="cards";if(tab==="gallery")render()}},1500);
 const best=Math.max(...PULL.cards.map(c=>RANKR[c.rarity]||0));
-return`<div class="packstage"><div class="bigpack r${best}"><span>${pk.e}</span><b>${esc(pk.n)}</b></div><p class="sl">${L("Opening…")}</p></div>`}
-return`<div class="reveal flipset">${PULL.cards.map((c,i)=>{const p=GP.find(x=>x.id===c.player_id);if(!p)return"";const big=(RANKR[c.rarity]||0)>=4;
-return`<div class="flip${big?" big":""}" style="--d:${(i*.7+.15).toFixed(2)}s"><div class="flip-in"><div class="flip-back"><span>⚽</span></div><div class="flip-front">${pcard(p,COL[p.id]||1,c.is_new?'<span class="pbadge">NEW!</span>':`<span class="pbadge dup">Duplicate +${c.refund} 🪙</span>`)}${big?'<i class="spark"></i><i class="spark s2"></i><i class="spark s3"></i>':""}</div></div></div>`}).join("")}</div>`}
+return`<div class="packstage"><div class="bigpack r${best}"><span>${pk.e}</span><b>${esc(pk.n)}${PULL.n>1?" ×"+PULL.n:""}</b></div><p class="sl">${L("Opening…")}</p></div>`}
+const many=PULL.cards.length>6;return`<div class="reveal flipset${many?" many":""}">${PULL.cards.map((c,i)=>{const p=GP.find(x=>x.id===c.player_id);if(!p)return"";const big=(RANKR[c.rarity]||0)>=4;
+return`<div class="flip${big?" big":""}" style="--d:${(i*(many?.22:.7)+.15).toFixed(2)}s"><div class="flip-in"><div class="flip-back"><span>⚽</span></div><div class="flip-front">${pcard(p,COL[p.id]||1,c.is_new?'<span class="pbadge">NEW!</span>':`<span class="pbadge dup">Duplicate +${c.refund} 🪙</span>`)}${big?'<i class="spark"></i><i class="spark s2"></i><i class="spark s3"></i>':""}</div></div></div>`}).join("")}</div>`}
 
 /* ---- DREAM TEAM: 11 players you own, one for every position of a 4-3-3. Every day each one scores (rating − 5) to (rating + 5) points,
    the same random number for everyone. Points add up every day. A changed team counts from the next day. Worked out by Supabase. ---- */
@@ -2393,6 +2464,13 @@ You got your champion coins!|Já recebeu as moedas do campeão!|¡Ya recibiste l
 Claim|Receber|Reclamar
 Your champion was|O seu campeão era|Tu campeón era
 Brackets are locked. Good luck!|As previsões estão fechadas. Boa sorte!|Los pronósticos están cerrados. ¡Suerte!
+Open another free|Abrir outro grátis|Abrir otro gratis
+Open|Abrir|Abrir
+free|grátis|gratis
+See the|Ver os|Ver los
+players|jogadores|jugadores
+owned|tenho|tengo
+These are the players you can get from this pack. Grey ones you don't have yet.|Estes são os jogadores que podem sair neste pacote. Os cinzentos ainda não tem.|Estos son los jugadores que pueden salir en este sobre. Los grises aún no los tienes.
 Admins|Admins|Admins`;
 TRX.split("\n").forEach(l=>{const p=l.split("|");if(p.length===3)DICT[p[0]]=[p[1],p[2]]});
 // Phrases with numbers or times in them
@@ -2476,27 +2554,44 @@ const showCoins=()=>document.querySelectorAll(".coinv").forEach(e=>e.textContent
 async function loadWallet(){if(!SB||!me)return;const{data,error}=await SB.rpc("my_wallet");if(!error&&typeof data==="number"){WAL=data;showCoins()}}
 // free packs given by admins (supabase-free-packs.sql)
 let PCRED={};async function loadCredits(){if(!SB||!me)return;const{data,error}=await SB.from("pack_credits").select("pack,n");if(!error){PCRED={};(data||[]).forEach(x=>{if(x.n>0)PCRED[x.pack]=x.n});if(tab==="gallery")render()}}
-async function loadGallery(){if(!SB||!me)return;gTried=true;loadCredits();seasonTick();try{const[pl,w,c]=await Promise.all([GP.length?{data:GP}:SB.from("gallery_players").select("*").order("id"),SB.rpc("my_wallet"),SB.from("collection").select("player_id,copies")]);const er=pl.error||w.error||c.error;
+async function loadGallery(){if(!SB||!me)return;gTried=true;loadPools();loadCredits();seasonTick();try{const[pl,w,c]=await Promise.all([GP.length?{data:GP}:SB.from("gallery_players").select("*").order("id"),SB.rpc("my_wallet"),SB.from("collection").select("player_id,copies")]);const er=pl.error||w.error||c.error;
 if(er)gMsg=/relation|does not exist|schema cache|function/i.test(er.message)?"The Gallery isn't set up in Supabase yet.":"Couldn't load your Gallery. Check your connection.";else{GP=pl.data||[];WAL=w.data;COL={};(c.data||[]).forEach(r=>COL[r.player_id]=r.copies);if(!/coins/.test(gMsg))gMsg=""}}catch(e){gMsg="Couldn't load your Gallery. Check your connection."}if(tab==="gallery"||tab==="derby")render()}
 const initials=n=>n.split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase();
 function pcard(p,copies,badge,delay){const r=rarOf(p.rarity);return `<div class="pc r-${p.rarity}${p.release_at?" s2":""}${p.special==="derby"?" derbycard":""}" style="--rc:${r[3]};${delay!=null?`animation-delay:${delay}s`:""}">${badge||""}${p.special==="derby"?'<span class="derbybadge">🔥 DERBY</span>':""}<div class="pc-top"><b>${p.rating}</b><span>${esc(p.position)}</span></div><div class="pc-av">${esc(initials(p.name))}</div><div class="pc-name">${esc(p.name)}</div><div class="pc-club">${esc(p.club)}</div><div class="pc-meta">${esc(p.nation)}${p.rising?" · 🌟":""}</div><div class="pc-r">${r[2]} ${r[1]}${copies>1?` · x${copies}`:""}</div></div>`}
 const hiddenCard=p=>`<div class="pc pc-hid" aria-label="Not collected yet"><div class="pc-q">?</div><div class="pc-name">#${p.id}</div></div>`;
 const packPool=pk=>GP.filter(p=>!p.special&&(!pk.club||p.club===pk.club)&&(pk.id!=="rising"||p.rising));
 const packOdds=pk=>{const ps=packPool(pk),ks=RAR.map(r=>r[0]).filter(k=>pk.w[k]&&ps.some(p=>p.rarity===k)),t=ks.reduce((a,k)=>a+pk.w[k],0);return ks.map(k=>[k,Math.round(pk.w[k]*1000/t)/10])};
-async function openPack(id){if(gBusy)return;const pk=PACKS.find(p=>p.id===id);if(!pk)return;if(!(PCRED[id]>0)&&WAL!=null&&WAL<packPrice(pk)){gMsg=`Not enough coins. You need 🪙 ${packPrice(pk)-WAL} more. Play games in the Arcade to earn them.`;return render()}
-gBusy=true;gMsg="";render();const{data,error}=await SB.rpc("open_pack",{p_pack:id});gBusy=false;
-if(error){gMsg=/not enough/i.test(error.message)?"Not enough coins. Play games in the Arcade to earn more.":/does not exist|schema cache/i.test(error.message)?"The Gallery isn't set up in Supabase yet.":"Couldn't open the pack. Check your connection and try again.";return render()}
-PULL={pack:pk,cards:data||[],stage:"pack"};if(PCRED[id]>0)PCRED[id]--;loadCredits();sfx("win");logAct("pack",{pack:pk.n,cards:(data||[]).map(c=>({n:(GP.find(p=>p.id===c.player_id)||{}).name||"?",r:c.rarity}))});gsub="open";scrollTo(0,0);await loadGallery()}
-function galleryPage(){const h='<h2 style="font-size:40px;margin-bottom:6px">Gallery</h2>';
+// open 1, 3, 5 or 10 packs at once: Supabase opens them one by one (free packs first, then coins) and you see all the cards together
+// each pack has its own list of about 40 players (supabase-pack-pools.sql); you can look at it before opening
+let PPOOL=null;
+function loadPools(){if(PPOOL||!SB||!me)return;PPOOL={};SB.from("pack_pool").select("pack,player_id").then(({data,error})=>{if(error||!data){return}const o={};data.forEach(r=>(o[r.pack]=o[r.pack]||[]).push(r.player_id));PPOOL=o;if(tab==="gallery"&&gsub==="packs")render()},()=>{})}
+function showPool(id){const pk=PACKS.find(p=>p.id===id),ids=(PPOOL&&PPOOL[id])||[];if(!pk)return;const pl=ids.map(i=>GP.find(p=>p.id===i)).filter(Boolean).sort((a,b)=>(RANKR[b.rarity]||0)-(RANKR[a.rarity]||0)||b.rating-a.rating),own=pl.filter(p=>COL[p.id]).length;
+const old=$("#poolbox");if(old)old.remove();const o=document.createElement("div");o.id="poolbox";o.setAttribute("role","dialog");o.setAttribute("aria-label",pk.n);
+o.innerHTML=`<div class="poolcard"><div class="row" style="justify-content:space-between;align-items:center;gap:10px"><h3 style="margin:0">${pk.e} ${esc(pk.n)} <small class="hint">${own}/${pl.length} ${L("owned")}</small></h3><button class="btn ghost" data-poolx="1">✕</button></div><p class="sl">${L("These are the players you can get from this pack. Grey ones you don't have yet.")}</p><div class="pgrid">${pl.map(p=>`<div class="${COL[p.id]?"":"notown"}">${pcard(p,COL[p.id]||1)}</div>`).join("")}</div></div>`;
+document.body.appendChild(o)}
+let PKN={};const PKNS=[1,3,5,10];
+const pkCost=(pk,n)=>{n=n||PKN[pk.id]||1;return Math.max(0,n-(PCRED[pk.id]||0))*packPrice(pk)};
+const pkCan=(pk,n)=>pkCost(pk,n)===0||(WAL!=null&&WAL>=pkCost(pk,n));
+const pkLabel=pk=>{const n=PKN[pk.id]||1,f=Math.min(PCRED[pk.id]||0,n),cost=pkCost(pk),what=n>1?`${L("Open")} ×${n}`:L("Open");
+return cost===0?`🎁 ${what} ${L("free")} (${PCRED[pk.id]} ${L("free")})`:`${pkCan(pk)?"":"🔒 "}${what} · 🪙 ${cost}${f?` + ${f} 🎁`:""}`};
+const pkChips=pk=>`<div class="pkn" role="group" aria-label="How many packs">${PKNS.map(k=>`<button class="chip" data-pkn="${esc(pk.id)}|${k}" aria-pressed="${(PKN[pk.id]||1)===k}">×${k}</button>`).join("")}</div>`;
+async function openPack(id,force){if(gBusy)return;const pk=PACKS.find(p=>p.id===id);if(!pk)return;const n=force||PKN[id]||1,cost=pkCost(pk,n);
+if(cost>0&&WAL!=null&&WAL<cost){gMsg=`Not enough coins${n>1?" for "+n+" packs":""}. You need 🪙 ${cost-WAL} more. Play games in the Arcade to earn them.`;return render()}
+gBusy=true;gMsg="";render();let all=[],done=0,err=null;
+for(let k=0;k<n;k++){const{data,error}=await SB.rpc("open_pack",{p_pack:id});if(error){err=error;break}all=all.concat(data||[]);done++;if(PCRED[id]>0)PCRED[id]--}
+gBusy=false;
+if(!done){gMsg=/not enough/i.test(err.message)?"Not enough coins. Play games in the Arcade to earn more.":/does not exist|schema cache/i.test(err.message)?"The Gallery isn't set up in Supabase yet.":"Couldn't open the pack. Check your connection and try again.";return render()}
+if(err)gMsg=`Opened ${done} of ${n} packs (${/not enough/i.test(err.message)?"ran out of coins":"connection problem"}).`;
+PULL={pack:pk,cards:all,stage:"pack",n:done};loadCredits();sfx("win");logAct("pack",{pack:pk.n+(done>1?" ×"+done:""),cards:all.map(c=>({n:(GP.find(p=>p.id===c.player_id)||{}).name||"?",r:c.rarity}))});gsub="open";scrollTo(0,0);await loadGallery()}function galleryPage(){const h='<h2 style="font-size:40px;margin-bottom:6px">Gallery</h2>';
 if(!SB)return h+'<p class="sl">The Gallery needs your Supabase connection.</p>';
 if(!gTried){loadGallery();return h+'<p class="sl">Loading your Gallery…</p>'}
 if(!GP.length)return h+`<p class="sl">${gMsg||"Loading your Gallery…"}</p>`;
 const owned=GP.filter(p=>COL[p.id]).length,pct=Math.round(owned*100/GP.length);
 const top=dailyHtml()+`<div class="gtop"><span class="coins">🪙 <span class="coinv">${WAL==null?"…":WAL}</span> coins</span><div class="gprog"><span>${owned}/${GP.length} players collected</span><i style="--w:${pct}%"></i></div></div>
 <div class="sub">${[["col","📖 Collection"],["dbl",`🔁 My doubles (${GP.filter(p=>(COL[p.id]||0)>=2).length})`],["packs","🎁 Packs"],["dream","⭐ Dream team"],["swap","♻️ Exchange"]].map(([k,l])=>`<button class="chip" data-gs="${k}" aria-pressed="${gsub===k||(k==="packs"&&gsub==="open")}">${l}</button>`).join("")}</div>${gMsg?`<p class="sl" role="status">${gMsg}</p>`:""}`;
-if(gsub==="dream")return h+top+dreamPage();if(gsub==="swap")return h+top+exchangeHtml();if(gsub==="open"&&PULL){const pk=PULL.pack,again=WAL!=null&&WAL>=packPrice(pk);
-return h+top+`<div class="panel" style="text-align:center"><h3>${pk.e} ${esc(pk.n)}</h3>${revealHtml()}<div class="row" style="justify-content:center;gap:10px;flex-wrap:wrap"><button class="btn packbtn ${again?"can":"cant"}" data-pack="${esc(pk.id)}" ${gBusy?"disabled":""}>${again?`Open another · 🪙 ${packPrice(pk)}`:`Need 🪙 ${packPrice(pk)}`}</button><button class="btn ghost" data-gs="col">See my collection</button><button class="btn ghost" data-gs="packs">All packs</button></div></div>`}
-if(gsub==="packs")return h+top+(Object.keys(PCRED).length?`<div class="freebar">🎁 ${L("You have free packs!")} ${Object.entries(PCRED).map(([k,n])=>`<b>${esc((PACKS.find(p=>p.id===k)||{n:k}).n)} ×${n}</b>`).join(" · ")}</div>`:"")+`<p class="sl">Earn 🪙 coins by playing any game in the Arcade, with no daily limit. Duplicates give some coins back.</p><div class="packs">${PACKS.map(pk=>{const free=PCRED[pk.id]||0,can=free>0||(WAL!=null&&WAL>=packPrice(pk));return`<div class="panel pk"><div class="pk-e">${pk.e}</div><h3>${esc(pk.n)}</h3><p class="sl" style="margin:2px 0 8px">${esc(pk.d)}</p><div class="odds">${packOdds(pk).map(([k,v])=>`<span>${rarOf(k)[2]} ${rarOf(k)[1]} <b>${v}%</b></span>`).join("")}</div><button class="btn packbtn ${can?"can":"cant"}" data-pack="${esc(pk.id)}" ${gBusy?"disabled":""}>${gBusy?"Opening…":free?`🎁 ${L("Open free")} (${free})`:can?`Open · 🪙 ${packPrice(pk)}`:`🔒 🪙 ${packPrice(pk)}`}</button></div>`}).join("")}<div class="panel pk chestpk"><div class="pk-e">🧰</div><h3>${L("Treasure chest")}</h3><p class="sl" style="margin:2px 0 8px">${L("5 random prizes: Basic, Rare, Epic, Legendary, Rising Stars, Icons or club packs, or 2000 coins.")}</p><button class="btn packbtn ${WAL!=null&&WAL>=CHEST_PRICE?"can":"cant"}" data-buychest="1">${WAL!=null&&WAL>=CHEST_PRICE?"Open":"🔒"} · 🪙 ${CHEST_PRICE}</button></div></div>`;
+if(gsub==="dream")return h+top+dreamPage();if(gsub==="swap")return h+top+exchangeHtml();if(gsub==="open"&&PULL){const pk=PULL.pack,free=PCRED[pk.id]||0,again=free>0||(WAL!=null&&WAL>=packPrice(pk)),others=Object.entries(PCRED).filter(([k,n])=>k!==pk.id&&n>0);
+return h+top+`<div class="panel" style="text-align:center"><h3>${pk.e} ${esc(pk.n)}${PULL.n>1?" ×"+PULL.n:""}</h3>${revealHtml()}<div class="row" style="justify-content:center;gap:10px;flex-wrap:wrap"><button class="btn packbtn ${pkCan(pk)?"can":"cant"}" data-pack="${esc(pk.id)}" ${gBusy?"disabled":""}>${gBusy?"Opening…":"↻ "+pkLabel(pk)}</button>${others.map(([k,n])=>{const q=PACKS.find(x=>x.id===k);return q?`<button class="btn packbtn can" data-pack1="${esc(k)}" ${gBusy?"disabled":""}>🎁 ${L("Open free")} ${esc(q.n)} (${n})</button>`:""}).join("")}<button class="btn ghost" data-gs="col">See my collection</button><button class="btn ghost" data-gs="packs">All packs</button></div></div>`}
+if(gsub==="packs")return h+top+(Object.keys(PCRED).length?`<div class="freebar">🎁 ${L("You have free packs!")} ${Object.entries(PCRED).map(([k,n])=>`<b>${esc((PACKS.find(p=>p.id===k)||{n:k}).n)} ×${n}</b>`).join(" · ")}</div>`:"")+`<p class="sl">Earn 🪙 coins by playing any game in the Arcade, with no daily limit. Duplicates give some coins back.</p><div class="packs">${PACKS.map(pk=>{const free=PCRED[pk.id]||0,can=free>0||(WAL!=null&&WAL>=packPrice(pk));return`<div class="panel pk"><div class="pk-e">${pk.e}</div><h3>${esc(pk.n)}</h3><p class="sl" style="margin:2px 0 8px">${esc(pk.d)}</p><div class="odds">${packOdds(pk).map(([k,v])=>`<span>${rarOf(k)[2]} ${rarOf(k)[1]} <b>${v}%</b></span>`).join("")}</div>${PPOOL&&PPOOL[pk.id]?`<button class="back poolbtn" data-pkpool="${esc(pk.id)}">👀 ${L("See the")} ${PPOOL[pk.id].length} ${L("players")} · ${PPOOL[pk.id].filter(i=>COL[i]).length} ${L("owned")}</button>`:""}${pkChips(pk)}<button class="btn packbtn ${pkCan(pk)?"can":"cant"}" data-pack="${esc(pk.id)}" ${gBusy?"disabled":""}>${gBusy?"Opening…":pkLabel(pk)}</button></div>`}).join("")}<div class="panel pk chestpk"><div class="pk-e">🧰</div><h3>${L("Treasure chest")}</h3><p class="sl" style="margin:2px 0 8px">${L("5 random prizes: Basic, Rare, Epic, Legendary, Rising Stars, Icons or club packs, or 2000 coins.")}</p><button class="btn packbtn ${WAL!=null&&WAL>=CHEST_PRICE?"can":"cant"}" data-buychest="1">${WAL!=null&&WAL>=CHEST_PRICE?"Open":"🔒"} · 🪙 ${CHEST_PRICE}</button></div></div>`;
 if(gsub==="dbl"){const d=GP.filter(p=>(COL[p.id]||0)>=2).sort((a,b)=>COL[b.id]-COL[a.id]);return h+top+`<p class="sl">Players you have more than one of. Trade them with friends: open a friend in the Friends tab and tap 🔄 Trade doubles. You can only swap a double for a double.</p>${d.length?`<div class="pgrid">${d.map(p=>pcard(p,COL[p.id],`<span class="pbadge dup">${COL[p.id]-1} spare</span>`)).join("")}</div>`:'<p class="sl">No doubles yet. When you get a player you already have from a pack, it shows up here.</p>'}<button class="btn ghost" data-t="friends" style="margin-top:14px">Go to Friends to trade →</button>`}
 const list=GP.filter(p=>gfil==="all"||(gfil==="owned"?COL[p.id]:!COL[p.id])).sort((a,b)=>(!!COL[b.id]-!!COL[a.id])||(COL[a.id]&&COL[b.id]?((RANKR[b.rarity]||0)-(RANKR[a.rarity]||0))||(b.rating-a.rating):a.id-b.id));// your cards first, best rarity first
 return h+top+`<div class="chips">${[["all","All "+GP.length],["owned",`Collected (${owned})`],["missing",`Missing (${GP.length-owned})`]].map(([k,l])=>`<button class="chip" data-gf="${k}" aria-pressed="${gfil===k}">${l}</button>`).join("")}</div>
@@ -2743,7 +2838,7 @@ else if(d.aask!==undefined){ACONF=d.aask||null}else if(d.ado){aDo(d.ado);return}
 else if(d.mode){authMode=d.mode}else if(d.sub!==undefined){doAuth();return}else if(d.out!==undefined){stopInbox();me=null;saved=[];tab=ST.start||"news";wantTab=null;if(SB)SB.auth.signOut();try{localStorage.removeItem("rf_session")}catch(x){}}else if(d.del){if(d.del==="ask")delAsk=true;else if(d.del==="no")delAsk=false;else if(SB){delAsk=false;SB.rpc("delete_me").then(({error})=>{if(!error){me=null;saved=[];SB.auth.signOut({scope:"local"})}render()});return}else{const u=US();delete u[me.email];wU(u);me=null;saved=[];delAsk=false;try{localStorage.removeItem("rf_session")}catch(x){}}}else if(d.acc!==undefined){ST.accent=+d.acc;applyST();saveST()}else if(d.tm){ST.mode=d.tm;applyST();saveST()}else if(d.sz){ST.size=+d.sz;applyST();saveST()}else if(d.lang){ST.lang=d.lang;applyST();saveST();render();translateDom();return}else if(d.tog){ST[d.tog]=!ST[d.tog];applyST();saveST()}else if(d.st){ST.start=d.st;saveST()}
 else if(d.clr){if(d.clr==="saved"){saved=[];persist()}else if(d.clr==="scores"){["pen","keep","keeper","quiz","stad","mem","dash","flap","tgt","snake","fk","word"].forEach(k=>{try{localStorage.removeItem("rf_hs_"+k)}catch(x){}})}else{ST={...DEF};applyST();saveST()}}
 else if(d.sv){toggleSave(d.sv)}
-else if(d.dguess!==undefined){dGuess();return}else if(d.dshare!==undefined){dShare();return}else if(d.day!==undefined){mday=+d.day}else if(d.share){shareFor=shareFor===d.share?null:d.share}else if(d.shareto){shareNews(shareFor,d.shareto);return}else if(d.openurl){const n=ANY().find(x=>x.url===d.openurl)||savedList().find(x=>x.url===d.openurl);if(n){openFrom=tab;open=n.id;tab="news";setTimeout(()=>scrollTo(0,0),0)}else{window.open(d.openurl,"_blank","noopener");return}}else if(d.gochat){tab="chat";room=d.gochat}else if(d.gs){gsub=d.gs;if(d.gs!=="open")PULL=null}else if(d.gf){gfil=d.gf}else if(d.pack){openPack(d.pack);return}else if(d.vote){const[i,k]=d.vote.split("|");castVote(i,k);return}else if(d.nm){newsMode=d.nm;cat="All"}else if(d.mm){matchMode=d.mm;lgSet=false}
+else if(d.dguess!==undefined){dGuess();return}else if(d.dshare!==undefined){dShare();return}else if(d.day!==undefined){mday=+d.day}else if(d.share){shareFor=shareFor===d.share?null:d.share}else if(d.shareto){shareNews(shareFor,d.shareto);return}else if(d.openurl){const n=ANY().find(x=>x.url===d.openurl)||savedList().find(x=>x.url===d.openurl);if(n){openFrom=tab;open=n.id;tab="news";setTimeout(()=>scrollTo(0,0),0)}else{window.open(d.openurl,"_blank","noopener");return}}else if(d.gochat){tab="chat";room=d.gochat}else if(d.gs){gsub=d.gs;if(d.gs!=="open")PULL=null}else if(d.gf){gfil=d.gf}else if(d.pack){openPack(d.pack);return}else if(d.pack1){openPack(d.pack1,1);return}else if(d.pkpool){showPool(d.pkpool);return}else if(d.poolx){const pb=$("#poolbox");if(pb)pb.remove();return}else if(d.pkn){const[i,k]=d.pkn.split("|");PKN[i]=+k}else if(d.vote){const[i,k]=d.vote.split("|");castVote(i,k);return}else if(d.nm){newsMode=d.nm;cat="All"}else if(d.mm){matchMode=d.mm;lgSet=false}
 else if(d.pc){const s=setupDraft.clubs;setupDraft.clubs=s.includes(d.pc)?s.filter(x=>x!==d.pc):[...s,d.pc]}
 else if(d.pn){setupDraft.country=setupDraft.country===d.pn?"":d.pn}
 else if(d.pl){const s=setupDraft.leagues;setupDraft.leagues=s.includes(d.pl)?s.filter(x=>x!==d.pl):[...s,d.pl]}
