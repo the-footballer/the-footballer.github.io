@@ -351,7 +351,7 @@ header{transition:box-shadow .3s}body.scrolled header{box-shadow:0 8px 24px #000
 .btn.wa{background:#25d366;color:#fff;display:inline-block;text-decoration:none}.sharebtn{margin-top:10px;background:linear-gradient(90deg,#ff7a18,#ff2bd6);color:#fff}
 .chal{margin:0 0 12px;padding:10px 12px;border-radius:12px;border:1.5px solid #ff7a18;background:#ff7a181f;display:flex;gap:6px;align-items:center;flex-wrap:wrap}.chal .back{margin-left:auto}
 .ptag{text-align:center;margin:0 0 8px}.weekly{border-color:#ffd23f66!important;background:linear-gradient(160deg,#ffd23f14,transparent)!important}.wprizes{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}.wprizes span{padding:4px 12px;border-radius:99px;background:#ffffff10;font-weight:700;font-size:14px}
-.wme{margin:4px 0}.wtop{margin:6px 0 10px;padding-left:24px;max-width:460px}.wtop li{padding:3px 0}.wtop li span{display:inline-block;min-width:60%}.wtop li.me{color:#ffd23f;font-weight:800}.wtop li.adm{opacity:.8}.wtop li.adm small{color:var(--mute);font-weight:600}
+.wme{margin:4px 0}.wtop{margin:6px 0 10px;padding-left:24px;max-width:460px}.wtop li{padding:3px 0}.wtop li span{display:inline-block;min-width:60%}.wtop li.me{color:#ffd23f;font-weight:800}.wadmin{margin:6px 0 10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#ffffff0a;font-size:14px}
 .weekmini{display:block;width:100%;text-align:left;margin:0 0 12px;padding:10px 14px;border-radius:14px;border:1.5px solid #ffd23f66;background:#ffd23f14;color:inherit;font:inherit;font-size:14px;cursor:pointer}.weekmini:hover{border-color:#ffd23f}
 .reveal.many{gap:10px}.reveal.many .pc{width:118px}.pkn{display:flex;gap:6px;justify-content:center;margin:0 0 8px}.pkn .chip{padding:4px 10px;font-size:13px}
 .reveal{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:18px 0}.reveal .pc{width:160px;animation:flipin .7s both}.reveal .r-ultimate{animation:flipin .7s both,ult 2.2s ease-in-out .7s infinite}
@@ -1686,11 +1686,11 @@ const weekLeft=()=>{const dow=(new Date(tDayPT()+"T00:00:00Z").getUTCDay()+6)%7,
 function weeklyHtml(){if(!me)return"";if(!WEEK)setTimeout(()=>loadWeek(),0);if(WEEK&&WEEK.err==="setup")return"";const W=WEEK&&!WEEK.err?WEEK:null;
   return`<div class="panel weekly"><h3>🏆 ${L("Weekly competition")} <small class="hint">${weekLeft()}</small></h3><p class="sl" style="margin-top:0">${L("Every Arcade point you earn from Monday to Sunday counts. The top 3 win free packs!")}</p>
 <div class="wprizes"><span>🥇 ${L("Icons pack")}</span><span>🥈 ${L("Legendary pack")}</span><span>🥉 ${L("Epic pack")}</span></div>
-${W?`<p class="wme">${L("You")}: <b>${Number(W.mine||0).toLocaleString()}</b> ${L("pts")}${W.mine>0?` · <b>#${W.rank}</b>`:""}${W.admin?` · 🛡️ ${L("admins play for fun, no prizes")}`:""}</p>${(W.top||[]).length?`<ol class="wtop">${(()=>{let place=0;return W.top.map(t=>{const medal=!t.admin&&++place<=3?["🥇","🥈","🥉"][place-1]+" ":"";return`<li class="${t.me?"me":""}${t.admin?" adm":""}"><span>${medal}${esc(t.name)}${t.admin?` 🛡️ <small>${L("admin, no prize")}</small>`:""}</span><b>${Number(t.pts).toLocaleString()}</b></li>`}).join("")})()}</ol>`:`<p class="sl">${L("No points yet this week. Be the first!")}</p>`}
+${W?`${W.admin?`<div class="wadmin">🛡️ <b>${L("You're an admin")}</b>: ${L("admins run the competition, so you don't appear in the list and can't win prizes. Your points still count for the normal leaderboards and the tournament.")} ${L("Your points this week")}: <b>${Number(W.mine||0).toLocaleString()}</b></div>`:`<p class="wme">${L("You")}: <b>${Number(W.mine||0).toLocaleString()}</b> ${L("pts")}${W.mine>0?` · <b>#${W.rank}</b>`:""}</p>`}${(W.top||[]).length?`<ol class="wtop">${W.top.map((t,i)=>`<li class="${t.me?"me":""}"><span>${i<3?["🥇","🥈","🥉"][i]+" ":""}${esc(t.name)}</span><b>${Number(t.pts).toLocaleString()}</b></li>`).join("")}</ol>`:`<p class="sl">${L("No points yet this week. Be the first!")}</p>`}
 ${(W.last||[]).length?`<p class="sl">${L("Last week")}: ${W.last.map(x=>["🥇","🥈","🥉"][x.place-1]+" "+esc(x.name)).join(" · ")}</p>`:""}`:`<p class="sl">${L("Loading…")}</p>`}
 <button class="btn" data-t="arcade">🎮 ${L("Play to climb")}</button></div>`}
 function weekMini(){if(!me)return"";if(!WEEK){setTimeout(()=>loadWeek(),0);return""}if(WEEK.err)return"";
-  return`<button class="weekmini" data-t="tournament">🏆 ${L("Weekly competition")}: <b>${WEEK.mine>0?"#"+WEEK.rank:"–"}</b> · ${Number(WEEK.mine||0).toLocaleString()} ${L("pts")} · ${weekLeft()} · 🥇 ${L("Icons pack")} →</button>`}
+  return`<button class="weekmini" data-t="tournament">🏆 ${L("Weekly competition")}: <b>${WEEK.admin?"🛡️ "+L("admin, no prizes"):WEEK.mine>0?"#"+WEEK.rank:"–"}</b> · ${Number(WEEK.mine||0).toLocaleString()} ${L("pts")} · ${weekLeft()} · 🥇 ${L("Icons pack")} →</button>`}
 /* ---- FORM GUIDE: who's hot, who's not, winning runs, biggest wins and the big games coming up.
    Worked out in the browser from the results and tables the site already loads (last 20 days of results). ---- */
 let fmLg=null;
@@ -2678,8 +2678,10 @@ Play to climb|Jogue para subir|Juega para subir
 ends tonight|acaba esta noite|termina esta noche
 day left|dia restante|día restante
 days left|dias restantes|días restantes
-admins play for fun, no prizes|os admins jogam por diversão, sem prémios|los admins juegan por diversión, sin premios
-admin, no prize|admin, sem prémio|admin, sin premio
+You're an admin|É administrador|Eres administrador
+admins run the competition, so you don't appear in the list and can't win prizes. Your points still count for the normal leaderboards and the tournament.|os administradores organizam a competição, por isso não aparece na lista e não pode ganhar prémios. Os seus pontos continuam a contar para as classificações normais e o torneio.|los administradores organizan la competición, así que no apareces en la lista y no puedes ganar premios. Tus puntos siguen contando para las clasificaciones normales y el torneo.
+Your points this week|Os seus pontos esta semana|Tus puntos esta semana
+admin, no prizes|admin, sem prémios|admin, sin premios
 Admins|Admins|Admins`;
 TRX.split("\n").forEach(l=>{const p=l.split("|");if(p.length===3)DICT[p[0]]=[p[1],p[2]]});
 // Phrases with numbers or times in them
